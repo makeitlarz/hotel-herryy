@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hotel Room & Table Service</title>
+  <title>Hotel Room & Table Ordering</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -20,76 +20,57 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 100px; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 95px; }
 
     header {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       color: #fff;
-      padding: 24px 20px 30px;
+      padding: 26px 20px 32px;
       text-align: center;
       border-bottom: 4px solid var(--accent);
       position: relative;
     }
     .admin-trigger {
       position: absolute;
-      top: 10px; right: 12px;
-      background: rgba(255,255,255,0.1);
-      color: #cbd5e1;
-      border: 1px solid rgba(255,255,255,0.2);
-      padding: 4px 8px;
+      top: 12px; right: 14px;
+      background: rgba(255,255,255,0.12);
+      color: #e2e8f0;
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 5px 10px;
       border-radius: 6px;
       font-size: 11px;
       cursor: pointer;
     }
-    header h1 { font-family: 'Playfair Display', serif; font-size: 24px; color: #fbbf24; margin-bottom: 4px; text-transform: uppercase; }
+    header h1 { font-family: 'Playfair Display', serif; font-size: 25px; color: #fbbf24; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
     header p { font-size: 12px; color: #cbd5e1; }
 
-    .container { max-width: 600px; margin: -16px auto 0; padding: 0 12px; }
+    .container { max-width: 560px; margin: -16px auto 0; padding: 0 14px; }
 
-    /* Promo Banner */
-    .promo-banner {
-      background: linear-gradient(90deg, #fef3c7, #fde68a);
-      border: 1px solid #f59e0b;
-      border-radius: 12px;
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-    .promo-banner div { font-size: 12px; font-weight: 600; color: #78350f; }
-    .promo-banner small { display: block; font-weight: 400; font-size: 10px; color: #92400e; }
-    .promo-btn { background: #d97706; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 14px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+    .card-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: var(--primary); }
 
-    .card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 14px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-    .card-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; color: var(--primary); }
+    label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
+    select, input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; background: #fff; }
+    input:read-only { background: #f1f5f9; font-weight: 700; color: var(--accent-hover); border-color: #cbd5e1; }
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
-    select, input { width: 100%; padding: 9px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; background: #fff; }
-    input:read-only { background: #f1f5f9; font-weight: 700; color: var(--accent-hover); }
-
-    /* Menu List */
-    .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border); }
+    .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px dashed var(--border); }
     .menu-item:last-child { border-bottom: none; }
-    .item-info h4 { font-size: 13px; font-weight: 600; }
-    .item-info span { font-size: 10px; color: var(--muted); background: #f1f5f9; padding: 2px 5px; border-radius: 4px; }
+    .item-info h4 { font-size: 14px; font-weight: 600; margin-top: 2px; }
+    .item-info span { font-size: 10px; color: var(--muted); background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
     .item-price { font-weight: 700; color: var(--primary); font-size: 13px; margin-top: 2px; }
 
-    .qty-box { display: flex; align-items: center; gap: 6px; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 3px; }
-    .qty-btn { width: 26px; height: 26px; border: none; background: var(--primary); color: #fff; border-radius: 5px; font-weight: 700; cursor: pointer; }
-    .qty-val { font-size: 13px; font-weight: 700; min-width: 16px; text-align: center; }
+    .qty-box { display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 4px; }
+    .qty-btn { width: 28px; height: 28px; border: none; background: var(--primary); color: #fff; border-radius: 6px; font-weight: 700; cursor: pointer; }
+    .qty-val { font-size: 14px; font-weight: 700; min-width: 18px; text-align: center; }
 
-    /* Bottom Bar */
-    .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid var(--border); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; z-index: 50; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
-    .total-box small { display: block; font-size: 10px; color: var(--muted); }
-    .total-box strong { font-size: 16px; color: var(--primary); }
-    .submit-btn { background: var(--accent); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; }
+    .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid var(--border); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; z-index: 50; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
+    .total-box small { display: block; font-size: 11px; color: var(--muted); }
+    .total-box strong { font-size: 17px; color: var(--primary); }
+    .submit-btn { background: var(--accent); color: #fff; border: none; padding: 11px 22px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; }
     .submit-btn:disabled { background: #94a3b8; }
 
-    /* Modals */
     .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 100; align-items: center; justify-content: center; padding: 14px; }
-    .modal-content { background: #fff; border-radius: 14px; max-width: 500px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 20px; position: relative; }
+    .modal-content { background: #fff; border-radius: 14px; max-width: 480px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 20px; position: relative; }
     .close-modal { position: absolute; top: 12px; right: 14px; background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 50%; font-weight: 700; cursor: pointer; }
 
     .admin-tabs { display: flex; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
@@ -101,77 +82,59 @@
     .badge.Success { background: #dcfce7; color: #15803d; }
     .badge.Cancelled { background: #fee2e2; color: #b91c1c; }
 
-    footer { text-align: center; font-size: 10px; color: var(--muted); margin-top: 20px; }
+    footer { text-align: center; font-size: 10px; color: var(--muted); margin-top: 22px; }
   </style>
 </head>
 <body>
 
   <header>
-    <button class="admin-trigger" onclick="openAdminLogin()">Admin</button>
+    <button class="admin-trigger" onclick="openPinModal()">Admin</button>
     <h1 id="hotelTitle">LOADING...</h1>
-    <p id="hotelTagline">Room & Table Ordering System</p>
+    <p id="hotelTagline">Room & Table Ordering</p>
   </header>
 
   <div class="container">
-    <!-- Game / Song Banner -->
-    <div class="promo-banner">
-      <div>
-        🎲 Waiting for food? Play & Win!
-        <small>Tap to play quick mini-game for discounts</small>
-      </div>
-      <button class="promo-btn" onclick="openGame()">Play Game</button>
-    </div>
-
-    <!-- Quick Location & PIN Card -->
+    <!-- Location Card -->
     <div class="card">
       <div class="card-title">
-        <span>📍 Select Location & PIN</span>
+        <span>📍 Room / Table Number</span>
         <span id="qrBadge" style="font-size:11px; color:var(--success);"></span>
       </div>
-      <div class="grid-2">
-        <div>
-          <label>Room / Table No. *</label>
-          <select id="locationSelect">
-            <option value="">-- Choose Location --</option>
-            <optgroup label="Rooms (1-10)">
-              <option value="Room 1">Room 1</option>
-              <option value="Room 2">Room 2</option>
-              <option value="Room 3">Room 3</option>
-              <option value="Room 4">Room 4</option>
-              <option value="Room 5">Room 5</option>
-              <option value="Room 6">Room 6</option>
-              <option value="Room 7">Room 7</option>
-              <option value="Room 8">Room 8</option>
-              <option value="Room 9">Room 9</option>
-              <option value="Room 10">Room 10</option>
-            </optgroup>
-            <optgroup label="Tables (T1-T10)">
-              <option value="Table 1">Table 1</option>
-              <option value="Table 2">Table 2</option>
-              <option value="Table 3">Table 3</option>
-              <option value="Table 4">Table 4</option>
-              <option value="Table 5">Table 5</option>
-              <option value="Table 6">Table 6</option>
-              <option value="Table 7">Table 7</option>
-              <option value="Table 8">Table 8</option>
-              <option value="Table 9">Table 9</option>
-              <option value="Table 10">Table 10</option>
-            </optgroup>
-          </select>
-          <input type="text" id="lockedLocation" style="display:none;" readonly>
-        </div>
-        <div>
-          <label>Today's Order PIN *</label>
-          <input type="password" id="dailyPin" placeholder="Ask staff / tent" maxlength="6">
-        </div>
-      </div>
+      <select id="locationSelect">
+        <option value="">-- Select Room or Table --</option>
+        <optgroup label="Rooms (1 - 10)">
+          <option value="Room 1">Room 1</option>
+          <option value="Room 2">Room 2</option>
+          <option value="Room 3">Room 3</option>
+          <option value="Room 4">Room 4</option>
+          <option value="Room 5">Room 5</option>
+          <option value="Room 6">Room 6</option>
+          <option value="Room 7">Room 7</option>
+          <option value="Room 8">Room 8</option>
+          <option value="Room 9">Room 9</option>
+          <option value="Room 10">Room 10</option>
+        </optgroup>
+        <optgroup label="Tables (1 - 10)">
+          <option value="Table 1">Table 1</option>
+          <option value="Table 2">Table 2</option>
+          <option value="Table 3">Table 3</option>
+          <option value="Table 4">Table 4</option>
+          <option value="Table 5">Table 5</option>
+          <option value="Table 6">Table 6</option>
+          <option value="Table 7">Table 7</option>
+          <option value="Table 8">Table 8</option>
+          <option value="Table 9">Table 9</option>
+          <option value="Table 10">Table 10</option>
+        </optgroup>
+      </select>
+      <input type="text" id="lockedLocation" style="display:none;" readonly>
     </div>
 
-    <!-- Menu List Card -->
+    <!-- Menu Card -->
     <div class="card">
       <div class="card-title">
-        <span>🍽️ Menu Items</span>
-        <span style="font-size:11px; color:var(--muted);">Tap + to add</span>
+        <span>🍽️ Menu</span>
+        <span style="font-size:11px; color:var(--muted);">Select items</span>
       </div>
       <div id="menuList">Loading menu...</div>
     </div>
@@ -179,51 +142,48 @@
     <footer>ALL RIGHTS RESERVED TO CHACHIA GROUP @ 2026</footer>
   </div>
 
-  <!-- Sticky Footer -->
+  <!-- Sticky Bottom Bar -->
   <div class="bottom-bar">
     <div class="total-box">
       <small id="itemCount">0 Items Selected</small>
       <strong>₹<span id="totalAmount">0</span></strong>
     </div>
-    <button class="submit-btn" id="submitBtn" onclick="submitOrder()">Place Order Now</button>
+    <button class="submit-btn" id="submitBtn" onclick="submitOrder()">Place Order</button>
   </div>
 
-  <!-- Success Modal -->
+  <!-- Order Success Popup -->
   <div class="modal" id="successModal">
     <div class="modal-content" style="text-align:center;">
       <div style="font-size:42px; margin-bottom:8px;">✅</div>
-      <h3 style="color:var(--success); margin-bottom:4px;">Order Placed Successfully!</h3>
-      <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Kitchen mein order bhej diya gaya hai.</p>
+      <h3 style="color:var(--success); margin-bottom:4px;">Order Submitted!</h3>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Aapka order bhej diya gaya hai.</p>
       <div style="background:#f1f5f9; padding:10px; border-radius:8px; font-weight:700; margin-bottom:14px; font-size:13px;">
         Order ID: <span id="confirmedOrderId" style="color:var(--accent-hover);"></span>
       </div>
-      <button class="submit-btn" style="width:100%;" onclick="closeModal('successModal')">OK / New Order</button>
+      <button class="submit-btn" style="width:100%;" onclick="closeModal('successModal')">Done</button>
     </div>
   </div>
 
-  <!-- Game Modal -->
-  <div class="modal" id="gameModal">
-    <div class="modal-content" style="text-align:center;">
-      <button class="close-modal" onclick="closeModal('gameModal')">✕</button>
-      <h3>🎲 Lucky Spin</h3>
-      <p style="font-size:12px; color:var(--muted); margin:6px 0 12px;">Spin for waiting time discount!</p>
-      <div id="spinResult" style="font-size:16px; font-weight:700; padding:16px; background:#fef3c7; border-radius:10px; margin-bottom:12px;">
-        Tap Spin to Play!
-      </div>
-      <button class="submit-btn" onclick="playSpin()">Spin Now</button>
+  <!-- Admin PIN Login Modal -->
+  <div class="modal" id="pinModal">
+    <div class="modal-content" style="max-width:340px; text-align:center;">
+      <button class="close-modal" onclick="closeModal('pinModal')">✕</button>
+      <h3 style="margin-bottom:10px; font-size:16px;">🔐 Admin Login</h3>
+      <input type="password" id="adminPinInput" placeholder="Enter Admin PIN" style="margin-bottom:12px; text-align:center;">
+      <button class="submit-btn" style="width:100%;" onclick="verifyAdminPin()">Open Admin Panel</button>
     </div>
   </div>
 
-  <!-- Admin Modal -->
+  <!-- Admin Dashboard Modal -->
   <div class="modal" id="adminModal">
     <div class="modal-content">
       <button class="close-modal" onclick="closeModal('adminModal')">✕</button>
-      <h3 style="margin-bottom:12px; font-size:16px;">🔐 Admin Portal</h3>
+      <h3 style="margin-bottom:12px; font-size:16px;">⚙️ Admin Dashboard</h3>
       
       <div class="admin-tabs">
-        <button class="tab-btn active" onclick="switchTab('ordersTab', this)">Live Orders</button>
-        <button class="tab-btn" onclick="switchTab('menuTab', this)">+ Add Menu</button>
-        <button class="tab-btn" onclick="switchTab('settingsTab', this)">Settings</button>
+        <button class="tab-btn active" onclick="switchTab('ordersTab', this)">Orders</button>
+        <button class="tab-btn" onclick="switchTab('menuTab', this)">+ Add Item</button>
+        <button class="tab-btn" onclick="switchTab('settingsTab', this)">Hotel Name</button>
       </div>
 
       <!-- Tab 1: Orders -->
@@ -235,37 +195,32 @@
       <!-- Tab 2: Add Menu -->
       <div id="menuTab" style="display:none;">
         <label>Category</label>
-        <input type="text" id="newCat" placeholder="Snacks, Beverages, etc." style="margin-bottom:8px;">
+        <input type="text" id="newCat" placeholder="Snacks, Beverages, Main Course" style="margin-bottom:8px;">
         <label>Item Name</label>
-        <input type="text" id="newItemName" placeholder="Paneer Tikka" style="margin-bottom:8px;">
+        <input type="text" id="newItemName" placeholder="Item Name" style="margin-bottom:8px;">
         <label>Price (₹)</label>
-        <input type="number" id="newItemPrice" placeholder="150" style="margin-bottom:12px;">
+        <input type="number" id="newItemPrice" placeholder="Price" style="margin-bottom:12px;">
         <button class="submit-btn" style="width:100%;" onclick="addMenuItem()">Add to Menu</button>
       </div>
 
-      <!-- Tab 3: Settings -->
+      <!-- Tab 3: Hotel Name Settings -->
       <div id="settingsTab" style="display:none;">
         <label>Hotel Name</label>
         <input type="text" id="setHotelName" style="margin-bottom:8px;">
         <label>Tagline</label>
-        <input type="text" id="setTagline" style="margin-bottom:8px;">
-        <label>Today's Order PIN</label>
-        <input type="text" id="setDailyPin" style="margin-bottom:8px;">
-        <label>Game Link</label>
-        <input type="text" id="setGameLink" style="margin-bottom:12px;">
-        <button class="submit-btn" style="width:100%;" onclick="saveSettings()">Save Settings</button>
+        <input type="text" id="setTagline" style="margin-bottom:12px;">
+        <button class="submit-btn" style="width:100%;" onclick="saveSettings()">Save Name</button>
       </div>
     </div>
   </div>
 
   <script>
-    // APNA GOOGLE APPS SCRIPT WEB APP URL YAHAN PASTE KAREIN
-    const SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_WEB_APP_URL";
+    // APNA NAYA DEPLOYED GOOGLE APPS SCRIPT URL YAHAN PASTE KAREIN
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTsgxryD2Hi8T9RNJ_xVGuAe1L-qast5RRUKDRzR4_IlnGHWt_IgG2KS32jwccHFS9/exec";
 
     let menuItems = [];
     let cart = {};
     let currentAdminPin = "";
-    let externalGameUrl = "#game";
 
     window.onload = function() {
       const params = new URLSearchParams(window.location.search);
@@ -295,18 +250,17 @@
         const data = await res.json();
         document.getElementById('hotelTitle').innerText = data.hotelName;
         document.getElementById('hotelTagline').innerText = data.tagline;
-        externalGameUrl = data.gameLink;
         menuItems = data.menu;
         renderMenu();
       } catch (err) {
-        document.getElementById('menuList').innerText = "Error loading menu.";
+        document.getElementById('menuList').innerText = "Error loading menu. Check Script URL.";
       }
     }
 
     function renderMenu() {
       const container = document.getElementById('menuList');
       if (menuItems.length === 0) {
-        container.innerHTML = "<p style='font-size:12px; color:var(--muted);'>No items found.</p>";
+        container.innerHTML = "<p style='font-size:12px; color:var(--muted);'>No items available.</p>";
         return;
       }
       container.innerHTML = menuItems.map(item => `
@@ -344,13 +298,10 @@
     }
 
     async function submitOrder() {
-      const lockedLoc = document.getElementById('lockedLocation').value;
-      const selectLoc = document.getElementById('locationSelect').value;
-      const location = lockedLoc || selectLoc;
-      const dailyPin = document.getElementById('dailyPin').value;
-
+      const location = document.getElementById('lockedLocation').value || document.getElementById('locationSelect').value;
       let orderedItems = [];
       let total = 0;
+
       menuItems.forEach(item => {
         if (cart[item.id] > 0) {
           orderedItems.push(`${item.name} x${cart[item.id]}`);
@@ -359,12 +310,11 @@
       });
 
       if (!location) return alert("Please select Room or Table number.");
-      if (!dailyPin) return alert("Please enter Today's Order PIN.");
-      if (orderedItems.length === 0) return alert("Please select at least 1 menu item.");
+      if (orderedItems.length === 0) return alert("Please select at least 1 item.");
 
       const btn = document.getElementById('submitBtn');
       btn.disabled = true;
-      btn.innerText = "Placing...";
+      btn.innerText = "Sending...";
 
       try {
         const res = await fetch(SCRIPT_URL, {
@@ -372,7 +322,6 @@
           body: JSON.stringify({
             action: 'placeOrder',
             location,
-            dailyPin,
             items: orderedItems.join(', '),
             total
           })
@@ -384,62 +333,62 @@
           cart = {};
           renderMenu();
           calculateTotal();
-        } else {
-          alert(result.message);
         }
       } catch (e) {
-        alert("Network error. Try again.");
+        alert("Order failed. Check internet or Script URL.");
       }
       btn.disabled = false;
-      btn.innerText = "Place Order Now";
+      btn.innerText = "Place Order";
     }
 
-    function openGame() {
-      if (externalGameUrl && externalGameUrl !== '#game') {
-        window.open(externalGameUrl, '_blank');
-      } else {
-        document.getElementById('gameModal').style.display = 'flex';
-      }
-    }
-    function playSpin() {
-      const prizes = ["🎉 5% Discount!", "🥤 1 Free Cold Drink!", "😅 Better Luck Next Time!"];
-      document.getElementById('spinResult').innerText = prizes[Math.floor(Math.random() * prizes.length)];
+    function openPinModal() {
+      document.getElementById('adminPinInput').value = '';
+      document.getElementById('pinModal').style.display = 'flex';
     }
 
-    function openAdminLogin() {
-      const pin = prompt("Enter Admin PIN:");
-      if (!pin) return;
+    function verifyAdminPin() {
+      const pin = document.getElementById('adminPinInput').value.trim();
+      if (!pin) return alert("Enter PIN");
       currentAdminPin = pin;
       refreshAdminData(true);
     }
 
-    async function refreshAdminData(openModal = false) {
-      const res = await fetch(`${SCRIPT_URL}?action=getAdminData&pin=${currentAdminPin}`);
-      const data = await res.json();
-      if (!data.success) return alert("Wrong Admin PIN!");
+    async function refreshAdminData(fromLogin = false) {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getAdminData&pin=${encodeURIComponent(currentAdminPin)}`);
+        const data = await res.json();
+        if (!data.success) return alert("Wrong Admin PIN!");
 
-      if (openModal) document.getElementById('adminModal').style.display = 'flex';
+        if (fromLogin) {
+          closeModal('pinModal');
+          document.getElementById('adminModal').style.display = 'flex';
+        }
 
-      document.getElementById('setHotelName').value = data.settings.HotelName || '';
-      document.getElementById('setTagline').value = data.settings.Tagline || '';
-      document.getElementById('setDailyPin').value = data.settings.DailyOrderPIN || '';
-      document.getElementById('setGameLink').value = data.settings.GameLink || '#game';
+        document.getElementById('setHotelName').value = data.settings.HotelName || '';
+        document.getElementById('setTagline').value = data.settings.Tagline || '';
 
-      const list = document.getElementById('adminOrdersList');
-      list.innerHTML = data.orders.map(o => `
-        <div class="order-card">
-          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <strong>${o.location} (${o.orderId})</strong>
-            <span class="badge ${o.status}">${o.status}</span>
+        const list = document.getElementById('adminOrdersList');
+        if (data.orders.length === 0) {
+          list.innerHTML = "<p style='font-size:12px; color:var(--muted);'>No orders yet.</p>";
+          return;
+        }
+        list.innerHTML = data.orders.map(o => `
+          <div class="order-card">
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <strong>${o.location} (${o.orderId})</strong>
+              <span class="badge ${o.status}">${o.status}</span>
+            </div>
+            <div style="font-size:11px; color:#475569; margin-bottom:4px;">🕒 ${o.time}</div>
+            <div style="font-size:12px; font-weight:600; margin-bottom:6px;">🍽️ ${o.items} — <strong>₹${o.total}</strong></div>
+            <div style="display:flex; gap:6px;">
+              <button onclick="changeStatus('${o.orderId}', 'Success')" style="background:#16a34a; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:10px; cursor:pointer;">✓ Success</button>
+              <button onclick="changeStatus('${o.orderId}', 'Cancelled')" style="background:#dc2626; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:10px; cursor:pointer;">✕ Cancel</button>
+            </div>
           </div>
-          <div style="font-size:11px; color:#475569; margin-bottom:4px;">🕒 ${o.time}</div>
-          <div style="font-size:12px; font-weight:600; margin-bottom:6px;">🍽️ ${o.items} — <strong>₹${o.total}</strong></div>
-          <div style="display:flex; gap:6px;">
-            <button onclick="changeStatus('${o.orderId}', 'Success')" style="background:#16a34a; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:10px; cursor:pointer;">✓ Success</button>
-            <button onclick="changeStatus('${o.orderId}', 'Cancelled')" style="background:#dc2626; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:10px; cursor:pointer;">✕ Cancel</button>
-          </div>
-        </div>
-      `).join('');
+        `).join('');
+      } catch (e) {
+        alert("Connection error with Google Sheet.");
+      }
     }
 
     async function changeStatus(orderId, status) {
@@ -460,7 +409,7 @@
         method: 'POST',
         body: JSON.stringify({ action: 'addMenuItem', pin: currentAdminPin, category, name, price })
       });
-      alert("Added to Menu!");
+      alert("Item Added!");
       document.getElementById('newItemName').value = '';
       document.getElementById('newItemPrice').value = '';
       loadInitialData();
@@ -469,14 +418,12 @@
     async function saveSettings() {
       const hotelName = document.getElementById('setHotelName').value;
       const tagline = document.getElementById('setTagline').value;
-      const dailyOrderPIN = document.getElementById('setDailyPin').value;
-      const gameLink = document.getElementById('setGameLink').value;
 
       await fetch(SCRIPT_URL, {
         method: 'POST',
-        body: JSON.stringify({ action: 'updateSettings', pin: currentAdminPin, hotelName, tagline, dailyOrderPIN, gameLink })
+        body: JSON.stringify({ action: 'updateSettings', pin: currentAdminPin, hotelName, tagline })
       });
-      alert("Settings Updated!");
+      alert("Updated!");
       loadInitialData();
     }
 
