@@ -20,7 +20,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 95px; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 40px; }
 
     header {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -53,34 +53,100 @@
     select, input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; background: #fff; }
     input:read-only { background: #f1f5f9; font-weight: 700; color: var(--accent-hover); border-color: #cbd5e1; }
 
-    .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px dashed var(--border); }
-    .menu-item:last-child { border-bottom: none; }
-    .item-info h4 { font-size: 14px; font-weight: 600; margin-top: 2px; }
-    .item-info span { font-size: 10px; color: var(--muted); background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
-    .item-price { font-weight: 700; color: var(--primary); font-size: 13px; margin-top: 2px; }
+    .selector-grid {
+      display: grid;
+      grid-template-columns: 1fr 85px;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .add-item-btn {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .add-item-btn:hover { background: #1e293b; }
 
-    .qty-box { display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 4px; }
-    .qty-btn { width: 28px; height: 28px; border: none; background: var(--primary); color: #fff; border-radius: 6px; font-weight: 700; cursor: pointer; }
-    .qty-val { font-size: 14px; font-weight: 700; min-width: 18px; text-align: center; }
+    .cart-list { margin-top: 14px; border-top: 1px dashed var(--border); padding-top: 10px; }
+    .cart-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+    .remove-btn {
+      background: #fee2e2;
+      color: var(--danger);
+      border: none;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 8px;
+    }
 
-    .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid var(--border); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; z-index: 50; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); }
+    .order-footer-box {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 2px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
     .total-box small { display: block; font-size: 11px; color: var(--muted); }
-    .total-box strong { font-size: 17px; color: var(--primary); }
-    .submit-btn { background: var(--accent); color: #fff; border: none; padding: 11px 22px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; }
-    .submit-btn:disabled { background: #94a3b8; }
+    .total-box strong { font-size: 19px; color: var(--primary); }
+    .submit-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .submit-btn:hover { background: var(--accent-hover); }
+    .submit-btn:disabled { background: #94a3b8; cursor: not-allowed; }
 
     .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 100; align-items: center; justify-content: center; padding: 14px; }
-    .modal-content { background: #fff; border-radius: 14px; max-width: 480px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 20px; position: relative; }
+    .modal-content { background: #fff; border-radius: 14px; max-width: 520px; width: 100%; max-height: 88vh; overflow-y: auto; padding: 20px; position: relative; }
     .close-modal { position: absolute; top: 12px; right: 14px; background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 50%; font-weight: 700; cursor: pointer; }
 
     .admin-tabs { display: flex; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
     .tab-btn { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: #f8fafc; font-size: 11px; font-weight: 600; cursor: pointer; }
     .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-    .order-card { border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 8px; background: #f8fafc; }
+
+    .order-card, .manage-item-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      background: #f8fafc;
+    }
     .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; }
     .badge.Pending { background: #fef3c7; color: #b45309; }
     .badge.Success { background: #dcfce7; color: #15803d; }
     .badge.Cancelled { background: #fee2e2; color: #b91c1c; }
+    .badge.Yes { background: #dcfce7; color: #15803d; }
+    .badge.No { background: #fee2e2; color: #b91c1c; }
+
+    .action-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .btn-sm { border: none; padding: 5px 9px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; color: #fff; }
+
+    .rate-edit-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+    .rate-edit-row input { width: 95px; padding: 6px 8px; font-size: 12px; }
 
     footer { text-align: center; font-size: 10px; color: var(--muted); margin-top: 22px; }
   </style>
@@ -94,7 +160,6 @@
   </header>
 
   <div class="container">
-    <!-- Location Card -->
     <div class="card">
       <div class="card-title">
         <span>📍 Room / Table Number</span>
@@ -130,25 +195,42 @@
       <input type="text" id="lockedLocation" style="display:none;" readonly>
     </div>
 
-    <!-- Menu Card -->
     <div class="card">
       <div class="card-title">
-        <span>🍽️ Menu</span>
-        <span style="font-size:11px; color:var(--muted);">Select items</span>
+        <span>🍽️ Select Food & Drinks</span>
+        <span style="font-size:11px; color:var(--muted);" id="menuCountBadge"></span>
       </div>
-      <div id="menuList">Loading menu...</div>
+
+      <div class="selector-grid">
+        <div>
+          <label>Choose Item</label>
+          <select id="menuDropdown">
+            <option value="">Loading menu...</option>
+          </select>
+        </div>
+        <div>
+          <label>Qty</label>
+          <input type="number" id="itemQty" value="1" min="1" max="50">
+        </div>
+      </div>
+
+      <button class="add-item-btn" onclick="addSelectedItem()">+ Add Item to Order</button>
+
+      <div class="cart-list" id="cartContainer" style="display:none;">
+        <label style="margin-bottom:6px;">Your Selected Items:</label>
+        <div id="cartItemsList"></div>
+      </div>
+
+      <div class="order-footer-box">
+        <div class="total-box">
+          <small id="itemCount">0 Items Selected</small>
+          <strong>Total: ₹<span id="totalAmount">0</span></strong>
+        </div>
+        <button class="submit-btn" id="submitBtn" onclick="submitOrder()">Place Order</button>
+      </div>
     </div>
 
     <footer>ALL RIGHTS RESERVED TO CHACHIA GROUP @ 2026</footer>
-  </div>
-
-  <!-- Sticky Bottom Bar -->
-  <div class="bottom-bar">
-    <div class="total-box">
-      <small id="itemCount">0 Items Selected</small>
-      <strong>₹<span id="totalAmount">0</span></strong>
-    </div>
-    <button class="submit-btn" id="submitBtn" onclick="submitOrder()">Place Order</button>
   </div>
 
   <!-- Order Success Popup -->
@@ -156,7 +238,7 @@
     <div class="modal-content" style="text-align:center;">
       <div style="font-size:42px; margin-bottom:8px;">✅</div>
       <h3 style="color:var(--success); margin-bottom:4px;">Order Submitted!</h3>
-      <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Aapka order bhej diya gaya hai.</p>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Aapka order kitchen mein bhej diya gaya hai.</p>
       <div style="background:#f1f5f9; padding:10px; border-radius:8px; font-weight:700; margin-bottom:14px; font-size:13px;">
         Order ID: <span id="confirmedOrderId" style="color:var(--accent-hover);"></span>
       </div>
@@ -164,7 +246,7 @@
     </div>
   </div>
 
-  <!-- Admin PIN Login Modal -->
+  <!-- Admin PIN Modal -->
   <div class="modal" id="pinModal">
     <div class="modal-content" style="max-width:340px; text-align:center;">
       <button class="close-modal" onclick="closeModal('pinModal')">✕</button>
@@ -181,8 +263,8 @@
       <h3 style="margin-bottom:12px; font-size:16px;">⚙️ Admin Dashboard</h3>
       
       <div class="admin-tabs">
-        <button class="tab-btn active" onclick="switchTab('ordersTab', this)">Orders</button>
-        <button class="tab-btn" onclick="switchTab('menuTab', this)">+ Add Item</button>
+        <button class="tab-btn active" onclick="switchTab('ordersTab', this)">Orders & Bills</button>
+        <button class="tab-btn" onclick="switchTab('menuTab', this)">Menu (Add/Edit/Del)</button>
         <button class="tab-btn" onclick="switchTab('settingsTab', this)">Hotel Name</button>
       </div>
 
@@ -192,18 +274,24 @@
         <div id="adminOrdersList">Loading orders...</div>
       </div>
 
-      <!-- Tab 2: Add Menu -->
+      <!-- Tab 2: Menu Add + Edit Rate + Hide/Show + Delete -->
       <div id="menuTab" style="display:none;">
-        <label>Category</label>
-        <input type="text" id="newCat" placeholder="Snacks, Beverages, Main Course" style="margin-bottom:8px;">
-        <label>Item Name</label>
-        <input type="text" id="newItemName" placeholder="Item Name" style="margin-bottom:8px;">
-        <label>Price (₹)</label>
-        <input type="number" id="newItemPrice" placeholder="Price" style="margin-bottom:12px;">
-        <button class="submit-btn" style="width:100%;" onclick="addMenuItem()">Add to Menu</button>
+        <div style="background:#f8fafc; border:1px solid var(--border); padding:12px; border-radius:8px; margin-bottom:14px;">
+          <h4 style="font-size:13px; margin-bottom:8px;">+ Add New Menu Item</h4>
+          <label>Category</label>
+          <input type="text" id="newCat" placeholder="Snacks, Beverages, Main Course" style="margin-bottom:8px;">
+          <label>Item Name</label>
+          <input type="text" id="newItemName" placeholder="Item Name" style="margin-bottom:8px;">
+          <label>Price (₹)</label>
+          <input type="number" id="newItemPrice" placeholder="Price" style="margin-bottom:10px;">
+          <button class="submit-btn" style="width:100%;" onclick="addMenuItem()">Add to Menu</button>
+        </div>
+
+        <h4 style="font-size:13px; margin-bottom:8px;">Existing Menu Items (Edit Rate / Hide / Delete)</h4>
+        <div id="adminMenuList">Loading menu items...</div>
       </div>
 
-      <!-- Tab 3: Hotel Name Settings -->
+      <!-- Tab 3: Hotel Name -->
       <div id="settingsTab" style="display:none;">
         <label>Hotel Name</label>
         <input type="text" id="setHotelName" style="margin-bottom:8px;">
@@ -215,12 +303,14 @@
   </div>
 
   <script>
-    // APNA NAYA DEPLOYED GOOGLE APPS SCRIPT URL YAHAN PASTE KAREIN
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTsgxryD2Hi8T9RNJ_xVGuAe1L-qast5RRUKDRzR4_IlnGHWt_IgG2KS32jwccHFS9/exec";
+    // APNA DEPLOYED GOOGLE APPS SCRIPT URL YAHAN PASTE KAREIN
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsDxwrS5F9bVaN6fs1kvLzm6U-bsboz7lrvwgqvAciqA6QNdy1g3jyfvpIB6s5B3Kf/exec";
 
     let menuItems = [];
-    let cart = {};
+    let cart = [];
     let currentAdminPin = "";
+    let currentHotelName = "HOTEL BILL";
+    let adminOrdersCache = [];
 
     window.onload = function() {
       const params = new URLSearchParams(window.location.search);
@@ -248,73 +338,96 @@
       try {
         const res = await fetch(`${SCRIPT_URL}?action=getInitData`);
         const data = await res.json();
+        currentHotelName = data.hotelName;
         document.getElementById('hotelTitle').innerText = data.hotelName;
         document.getElementById('hotelTagline').innerText = data.tagline;
         menuItems = data.menu;
-        renderMenu();
+        populateDropdown();
       } catch (err) {
-        document.getElementById('menuList').innerText = "Error loading menu. Check Script URL.";
+        document.getElementById('menuDropdown').innerHTML = "<option>Error loading menu</option>";
       }
     }
 
-    function renderMenu() {
-      const container = document.getElementById('menuList');
+    function populateDropdown() {
+      const dropdown = document.getElementById('menuDropdown');
+      document.getElementById('menuCountBadge').innerText = `${menuItems.length} Items`;
       if (menuItems.length === 0) {
-        container.innerHTML = "<p style='font-size:12px; color:var(--muted);'>No items available.</p>";
+        dropdown.innerHTML = "<option value=''>No items available</option>";
         return;
       }
-      container.innerHTML = menuItems.map(item => `
-        <div class="menu-item">
-          <div class="item-info">
-            <span>${item.category}</span>
-            <h4>${item.name}</h4>
-            <div class="item-price">₹${item.price}</div>
-          </div>
-          <div class="qty-box">
-            <button class="qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
-            <span class="qty-val" id="qty-${item.id}">0</span>
-            <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
-          </div>
-        </div>
-      `).join('');
+      dropdown.innerHTML = `<option value="">-- Select an item --</option>` + 
+        menuItems.map(item => `<option value="${item.id}">[${item.category}] ${item.name} — ₹${item.price}</option>`).join('');
     }
 
-    function updateQty(id, change) {
-      cart[id] = (cart[id] || 0) + change;
-      if (cart[id] < 0) cart[id] = 0;
-      document.getElementById(`qty-${id}`).innerText = cart[id];
-      calculateTotal();
+    function addSelectedItem() {
+      const selectedId = document.getElementById('menuDropdown').value;
+      const qty = parseInt(document.getElementById('itemQty').value) || 1;
+      if (!selectedId) return alert("Pehle menu dropdown se koi item chunein.");
+      if (qty < 1) return alert("Quantity kam se kam 1 honi chahiye.");
+
+      const itemObj = menuItems.find(m => String(m.id) === String(selectedId));
+      if (!itemObj) return;
+
+      const existing = cart.find(c => String(c.id) === String(selectedId));
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        cart.push({ id: itemObj.id, name: itemObj.name, price: itemObj.price, qty: qty });
+      }
+
+      document.getElementById('menuDropdown').value = "";
+      document.getElementById('itemQty').value = 1;
+      renderCart();
     }
 
-    function calculateTotal() {
-      let total = 0, count = 0;
-      menuItems.forEach(item => {
-        const q = cart[item.id] || 0;
-        total += q * item.price;
-        count += q;
-      });
+    function removeCartItem(index) {
+      cart.splice(index, 1);
+      renderCart();
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cartContainer');
+      const list = document.getElementById('cartItemsList');
+      let total = 0, totalQty = 0;
+
+      if (cart.length === 0) {
+        container.style.display = 'none';
+        document.getElementById('totalAmount').innerText = 0;
+        document.getElementById('itemCount').innerText = "0 Items Selected";
+        return;
+      }
+
+      container.style.display = 'block';
+      list.innerHTML = cart.map((c, idx) => {
+        const sub = c.price * c.qty;
+        total += sub;
+        totalQty += c.qty;
+        return `
+          <div class="cart-row">
+            <div><strong>${c.name}</strong> × ${c.qty}</div>
+            <div>
+              <strong>₹${sub}</strong>
+              <button class="remove-btn" onclick="removeCartItem(${idx})">✕</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
       document.getElementById('totalAmount').innerText = total;
-      document.getElementById('itemCount').innerText = `${count} Items Selected`;
+      document.getElementById('itemCount').innerText = `${totalQty} Items Selected`;
     }
 
     async function submitOrder() {
       const location = document.getElementById('lockedLocation').value || document.getElementById('locationSelect').value;
-      let orderedItems = [];
-      let total = 0;
-
-      menuItems.forEach(item => {
-        if (cart[item.id] > 0) {
-          orderedItems.push(`${item.name} x${cart[item.id]}`);
-          total += cart[item.id] * item.price;
-        }
-      });
-
       if (!location) return alert("Please select Room or Table number.");
-      if (orderedItems.length === 0) return alert("Please select at least 1 item.");
+      if (cart.length === 0) return alert("Please add at least 1 item to your order.");
+
+      const itemsText = cart.map(c => `${c.name} x${c.qty}`).join(', ');
+      const total = cart.reduce((sum, c) => sum + (c.price * c.qty), 0);
 
       const btn = document.getElementById('submitBtn');
       btn.disabled = true;
-      btn.innerText = "Sending...";
+      btn.innerText = "Placing...";
 
       try {
         const res = await fetch(SCRIPT_URL, {
@@ -322,7 +435,7 @@
           body: JSON.stringify({
             action: 'placeOrder',
             location,
-            items: orderedItems.join(', '),
+            items: itemsText,
             total
           })
         });
@@ -330,9 +443,8 @@
         if (result.success) {
           document.getElementById('confirmedOrderId').innerText = result.orderId;
           document.getElementById('successModal').style.display = 'flex';
-          cart = {};
-          renderMenu();
-          calculateTotal();
+          cart = [];
+          renderCart();
         }
       } catch (e) {
         alert("Order failed. Check internet or Script URL.");
@@ -364,30 +476,172 @@
           document.getElementById('adminModal').style.display = 'flex';
         }
 
+        currentHotelName = data.settings.HotelName || currentHotelName;
         document.getElementById('setHotelName').value = data.settings.HotelName || '';
         document.getElementById('setTagline').value = data.settings.Tagline || '';
+        adminOrdersCache = data.orders;
 
-        const list = document.getElementById('adminOrdersList');
-        if (data.orders.length === 0) {
-          list.innerHTML = "<p style='font-size:12px; color:var(--muted);'>No orders yet.</p>";
-          return;
-        }
-        list.innerHTML = data.orders.map(o => `
-          <div class="order-card">
-            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-              <strong>${o.location} (${o.orderId})</strong>
-              <span class="badge ${o.status}">${o.status}</span>
-            </div>
-            <div style="font-size:11px; color:#475569; margin-bottom:4px;">🕒 ${o.time}</div>
-            <div style="font-size:12px; font-weight:600; margin-bottom:6px;">🍽️ ${o.items} — <strong>₹${o.total}</strong></div>
-            <div style="display:flex; gap:6px;">
-              <button onclick="changeStatus('${o.orderId}', 'Success')" style="background:#16a34a; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:10px; cursor:pointer;">✓ Success</button>
-              <button onclick="changeStatus('${o.orderId}', 'Cancelled')" style="background:#dc2626; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:10px; cursor:pointer;">✕ Cancel</button>
-            </div>
-          </div>
-        `).join('');
+        renderAdminOrders(data.orders);
+        renderAdminMenu(data.allMenu || []);
       } catch (e) {
         alert("Connection error with Google Sheet.");
+      }
+    }
+
+    function renderAdminOrders(orders) {
+      const list = document.getElementById('adminOrdersList');
+      if (!orders || orders.length === 0) {
+        list.innerHTML = "<p style='font-size:12px; color:var(--muted);'>No orders yet.</p>";
+        return;
+      }
+      list.innerHTML = orders.map((o, idx) => `
+        <div class="order-card">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <strong>${o.location} (${o.orderId})</strong>
+            <span class="badge ${o.status}">${o.status}</span>
+          </div>
+          <div style="font-size:11px; color:#475569; margin-bottom:4px;">🕒 ${o.time}</div>
+          <div style="font-size:12px; font-weight:600; margin-bottom:6px;">🍽️ ${o.items} — <strong>₹${o.total}</strong></div>
+          <div class="action-btns">
+            <button class="btn-sm" style="background:#16a34a;" onclick="changeStatus('${o.orderId}', 'Success')">✓ Success</button>
+            <button class="btn-sm" style="background:#dc2626;" onclick="changeStatus('${o.orderId}', 'Cancelled')">✕ Cancel</button>
+            <button class="btn-sm" style="background:#0f172a;" onclick="printBill(${idx})">🖨️ Print Bill</button>
+            <button class="btn-sm" style="background:#25d366;" onclick="shareBill(${idx})">📲 Share</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderAdminMenu(allMenu) {
+      const container = document.getElementById('adminMenuList');
+      if (!allMenu || allMenu.length === 0) {
+        container.innerHTML = "<p style='font-size:12px; color:var(--muted);'>No menu items in sheet.</p>";
+        return;
+      }
+      container.innerHTML = allMenu.map(item => {
+        const isAvail = String(item.available).toLowerCase() === 'yes';
+        const nextAvail = isAvail ? 'No' : 'Yes';
+        const toggleLabel = isAvail ? 'Hide Item' : 'Show Item';
+        return `
+          <div class="manage-item-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong>${item.name}</strong>
+                <span style="font-size:11px; color:var(--muted);">(${item.category})</span>
+              </div>
+              <span class="badge ${isAvail ? 'Yes' : 'No'}">${isAvail ? 'Active' : 'Hidden'}</span>
+            </div>
+            <div class="rate-edit-row">
+              <span style="font-size:12px; font-weight:600;">Rate ₹:</span>
+              <input type="number" id="rate-${item.id}" value="${item.price}">
+              <button class="btn-sm" style="background:#d97706;" onclick="saveItemRate('${item.id}')">Save Rate</button>
+              <button class="btn-sm" style="background:#475569;" onclick="toggleItemAvail('${item.id}', '${nextAvail}')">${toggleLabel}</button>
+              <button class="btn-sm" style="background:#dc2626;" onclick="deleteMenuItem('${item.id}', '${item.name.replace(/'/g, '')}')">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function saveItemRate(id) {
+      const newPrice = document.getElementById(`rate-${id}`).value;
+      if (!newPrice || Number(newPrice) <= 0) return alert("Valid rate daalein.");
+
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'updateMenuItem',
+          pin: currentAdminPin,
+          id: id,
+          price: Number(newPrice)
+        })
+      });
+      alert("Rate Updated!");
+      refreshAdminData();
+      loadInitialData();
+    }
+
+    async function toggleItemAvail(id, nextAvail) {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'updateMenuItem',
+          pin: currentAdminPin,
+          id: id,
+          available: nextAvail
+        })
+      });
+      refreshAdminData();
+      loadInitialData();
+    }
+
+    async function deleteMenuItem(id, name) {
+      if (!confirm(`Kya aap "${name}" ko menu se permanently delete karna chahte hain?`)) return;
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'deleteMenuItem',
+          pin: currentAdminPin,
+          id: id
+        })
+      });
+      alert("Item Deleted!");
+      refreshAdminData();
+      loadInitialData();
+    }
+
+    function printBill(index) {
+      const o = adminOrdersCache[index];
+      if (!o) return;
+      const win = window.open('', '_blank', 'width=350,height=550');
+      win.document.write(`
+        <html>
+        <head><title>Bill - ${o.orderId}</title>
+        <style>
+          body { font-family: monospace; padding: 16px; width: 280px; margin: auto; }
+          h2, p { text-align: center; margin: 4px 0; }
+          hr { border-top: 1px dashed #000; margin: 10px 0; }
+          .row { display: flex; justify-content: space-between; font-size: 13px; margin: 4px 0; }
+        </style>
+        </head>
+        <body>
+          <h2>${currentHotelName}</h2>
+          <p>TAX INVOICE / BILL</p>
+          <hr>
+          <div class="row"><span>Order ID:</span><strong>${o.orderId}</strong></div>
+          <div class="row"><span>Location:</span><strong>${o.location}</strong></div>
+          <div class="row"><span>Date:</span><span>${o.time}</span></div>
+          <hr>
+          <p style="text-align:left; font-weight:bold;">Items:</p>
+          <p style="text-align:left; font-size:13px;">${o.items}</p>
+          <hr>
+          <div class="row" style="font-size:16px;"><strong>GRAND TOTAL:</strong><strong>₹${o.total}</strong></div>
+          <hr>
+          <p>Thank you for visiting!</p>
+          <script>window.print();<\/script>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+
+    function shareBill(index) {
+      const o = adminOrdersCache[index];
+      if (!o) return;
+      const billText = `*${currentHotelName} - BILL*\n` +
+        `Order ID: ${o.orderId}\n` +
+        `Location: ${o.location}\n` +
+        `Date: ${o.time}\n` +
+        `------------------------\n` +
+        `Items: ${o.items}\n` +
+        `------------------------\n` +
+        `*Total Amount: ₹${o.total}*\n` +
+        `Thank you!`;
+
+      if (navigator.share) {
+        navigator.share({ title: `Bill ${o.orderId}`, text: billText });
+      } else {
+        window.open(`https://wa.me/?text=${encodeURIComponent(billText)}`, '_blank');
       }
     }
 
@@ -412,6 +666,7 @@
       alert("Item Added!");
       document.getElementById('newItemName').value = '';
       document.getElementById('newItemPrice').value = '';
+      refreshAdminData();
       loadInitialData();
     }
 
