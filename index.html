@@ -68,6 +68,9 @@
     select, input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; background: #fff; }
     input:read-only { background: #f1f5f9; font-weight: 700; color: var(--accent-hover); border-color: #cbd5e1; }
 
+    .field-gap { margin-bottom: 10px; }
+    .two-col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
     .selector-grid {
       display: grid;
       grid-template-columns: 1fr 85px;
@@ -139,6 +142,10 @@
     .modal-content { background: #fff; border-radius: 14px; max-width: 540px; width: 100%; max-height: 88vh; overflow-y: auto; padding: 20px; position: relative; }
     .close-modal { position: absolute; top: 12px; right: 14px; background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 50%; font-weight: 700; cursor: pointer; }
 
+    .login-role-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .role-btn { padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: #f8fafc; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .role-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
     .admin-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
     .tab-btn { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); background: #f8fafc; font-size: 11px; font-weight: 600; cursor: pointer; }
     .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
@@ -163,24 +170,13 @@
     .rate-edit-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
     .rate-edit-row input { width: 95px; padding: 6px 8px; font-size: 12px; }
 
-    .refresh-mini-btn {
-      background: #f1f5f9;
-      border: 1px solid var(--border);
-      color: var(--primary);
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
     footer { text-align: center; font-size: 10px; color: var(--muted); margin-top: 22px; }
   </style>
 </head>
 <body>
 
   <header>
-    <button class="admin-trigger" onclick="openPinModal()">Admin / Partner</button>
+    <button class="admin-trigger" onclick="openPinModal()">Admin / Partner Login</button>
     <h1 id="hotelTitle">LOADING...</h1>
     <p id="hotelTagline">Room & Table Ordering</p>
   </header>
@@ -191,10 +187,25 @@
         <span>📍 TEA POINT</span>
         <span id="qrBadge" style="font-size:11px; color:var(--success);"></span>
       </div>
-      <select id="locationSelect" onchange="handleLocationChange()">
-        <option value="">-- SELECT ROOM / TABLE --</option>
-      </select>
-      <input type="text" id="lockedLocation" style="display:none;" readonly>
+
+      <div class="field-gap">
+        <label for="locationSelect">Room / Table / Hotel</label>
+        <select id="locationSelect">
+          <option value="">-- SELECT ROOM / TABLE --</option>
+        </select>
+        <input type="text" id="lockedLocation" style="display:none;" readonly>
+      </div>
+
+      <div class="two-col-grid">
+        <div>
+          <label for="customerNameInput">Registered Customer Name *</label>
+          <input type="text" id="customerNameInput" placeholder="Customer Name">
+        </div>
+        <div>
+          <label for="customerPinInput">Customer PIN *</label>
+          <input type="password" id="customerPinInput" placeholder="Customer PIN">
+        </div>
+      </div>
     </div>
 
     <div class="card">
@@ -232,15 +243,6 @@
       </div>
     </div>
 
-    <!-- Active QR/Selected Location Orders Only -->
-    <div class="card" id="myOrdersCard" style="display:none;">
-      <div class="card-title">
-        <span>🧾 Orders for <span id="activeLocationLabel" style="color:var(--accent-hover);"></span></span>
-        <button class="refresh-mini-btn" onclick="loadLocationOrders()">🔄 Refresh</button>
-      </div>
-      <div id="myOrdersList" style="font-size:12px; color:var(--muted);">Loading orders...</div>
-    </div>
-
     <footer>ALL RIGHTS RESERVED TO CHACHIA GROUP @ 2026</footer>
   </div>
 
@@ -257,13 +259,28 @@
     </div>
   </div>
 
-  <!-- PIN Modal -->
+  <!-- Separate Admin PIN / Partner PIN Login Modal -->
   <div class="modal" id="pinModal">
-    <div class="modal-content" style="max-width:340px; text-align:center;">
+    <div class="modal-content" style="max-width:360px; text-align:center;">
       <button class="close-modal" onclick="closeModal('pinModal')">✕</button>
-      <h3 style="margin-bottom:10px; font-size:16px;">🔐 Login with PIN</h3>
-      <input type="password" id="adminPinInput" placeholder="Enter Admin or Partner PIN" style="margin-bottom:12px; text-align:center;">
-      <button class="submit-btn" style="width:100%;" onclick="verifyPin()">Open Panel</button>
+      <h3 style="margin-bottom:10px; font-size:16px;">🔐 Staff Login</h3>
+
+      <div class="login-role-switch">
+        <button type="button" class="role-btn active" id="rolePartnerBtn" onclick="selectLoginRole('partner')">Partner PIN</button>
+        <button type="button" class="role-btn" id="roleAdminBtn" onclick="selectLoginRole('admin')">Admin PIN</button>
+      </div>
+
+      <div id="partnerPinBox" class="field-gap">
+        <label for="partnerPinInput">Partner PIN (Sirf Apne Table/Room Ke Orders)</label>
+        <input type="password" id="partnerPinInput" placeholder="Enter Partner PIN" style="text-align:center;">
+      </div>
+
+      <div id="adminPinBox" class="field-gap" style="display:none;">
+        <label for="adminPinInput">Main Admin PIN (Full Access)</label>
+        <input type="password" id="adminPinInput" placeholder="Enter Admin PIN" style="text-align:center;">
+      </div>
+
+      <button class="submit-btn" style="width:100%;" onclick="verifyPin()">Login</button>
     </div>
   </div>
 
@@ -274,7 +291,8 @@
       <h3 id="panelHeading" style="margin-bottom:12px; font-size:16px;">⚙️ Dashboard</h3>
 
       <div class="admin-tabs" id="panelTabs">
-        <button class="tab-btn active" id="tabOrdersBtn" onclick="switchTab('ordersTab', this)">Orders & Bills</button>
+        <button class="tab-btn active" id="tabOrdersBtn" onclick="switchTab('ordersTab', this)">Orders</button>
+        <button class="tab-btn" id="tabCustomersBtn" onclick="switchTab('customersTab', this)">Customers (Name + PIN)</button>
         <button class="tab-btn" id="tabLocationsBtn" style="display:none;" onclick="switchTab('locationsTab', this)">Rooms & Tables</button>
         <button class="tab-btn" id="tabMenuBtn" style="display:none;" onclick="switchTab('menuTab', this)">Menu</button>
         <button class="tab-btn" id="tabSettingsBtn" style="display:none;" onclick="switchTab('settingsTab', this)">Hotel Name</button>
@@ -286,7 +304,30 @@
         <div id="adminOrdersList">Loading orders...</div>
       </div>
 
-      <!-- Tab 2: Add / Manage Rooms, Tables & QR/Partner PINs (Main Admin Only) -->
+      <!-- Tab 2: Add / Manage Authorized Customers (Admin & Partner) -->
+      <div id="customersTab" style="display:none;">
+        <div style="background:#f8fafc; border:1px solid var(--border); padding:12px; border-radius:8px; margin-bottom:14px;">
+          <h4 style="font-size:13px; margin-bottom:8px;">+ Add Authorized Customer (Name + PIN)</h4>
+          <div class="field-gap">
+            <label>Customer Name</label>
+            <input type="text" id="newCustName" placeholder="e.g. Rahul Sharma">
+          </div>
+          <div class="field-gap">
+            <label>Customer PIN</label>
+            <input type="text" id="newCustPin" placeholder="e.g. 7890">
+          </div>
+          <div id="custLocWrap" class="field-gap">
+            <label>Allow for Room/Table (Optional - empty = any location)</label>
+            <input type="text" id="newCustLoc" placeholder="e.g. Table 1 or Room 2">
+          </div>
+          <button class="submit-btn" style="width:100%;" onclick="addNewCustomer()">+ Add Customer</button>
+        </div>
+
+        <h4 style="font-size:13px; margin-bottom:8px;">Authorized Customers</h4>
+        <div id="adminCustomersList">Loading...</div>
+      </div>
+
+      <!-- Tab 3: Add / Manage Rooms, Tables & Partner PINs (Main Admin Only) -->
       <div id="locationsTab" style="display:none;">
         <div style="background:#f8fafc; border:1px solid var(--border); padding:12px; border-radius:8px; margin-bottom:14px;">
           <h4 style="font-size:13px; margin-bottom:8px;">+ Add New Room or Table</h4>
@@ -296,8 +337,8 @@
             <option value="Tables (1 - 10)">Tables</option>
           </select>
           <label>Room / Table / Hotel Name</label>
-          <input type="text" id="newLocName" placeholder="e.g. Room 11 or OMM JI HOTEL 2" style="margin-bottom:8px;">
-          <label>QR / Partner View PIN (Optional - sirf is location ke orders dekhne ke liye)</label>
+          <input type="text" id="newLocName" placeholder="e.g. Table 11 or Room 11" style="margin-bottom:8px;">
+          <label>Partner PIN (Sirf is Table/Room ke orders dekhne ke liye)</label>
           <input type="text" id="newLocPin" placeholder="e.g. 5566" style="margin-bottom:10px;">
           <button class="submit-btn" style="width:100%;" onclick="addNewLocation()">+ Add Room / Table</button>
         </div>
@@ -306,7 +347,7 @@
         <div id="adminLocationsList">Loading...</div>
       </div>
 
-      <!-- Tab 3: Menu (Main Admin Only) -->
+      <!-- Tab 4: Menu (Main Admin Only) -->
       <div id="menuTab" style="display:none;">
         <div style="background:#f8fafc; border:1px solid var(--border); padding:12px; border-radius:8px; margin-bottom:14px;">
           <h4 style="font-size:13px; margin-bottom:8px;">+ Add New Menu Item</h4>
@@ -323,7 +364,7 @@
         <div id="adminMenuList">Loading menu items...</div>
       </div>
 
-      <!-- Tab 4: Hotel Settings (Main Admin Only) -->
+      <!-- Tab 5: Hotel Settings (Main Admin Only) -->
       <div id="settingsTab" style="display:none;">
         <label>Hotel Name</label>
         <input type="text" id="setHotelName" style="margin-bottom:8px;">
@@ -335,16 +376,16 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw1znkA1jptEUvBDGeErEmtfEngRQtT6lU4EFvzTPRQ47ITTvwbO2ypOmz-oCl_OGmi/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsDxwrS5F9bVaN6fs1kvLzm6U-bsboz7lrvwgqvAciqA6QNdy1g3jyfvpIB6s5B3Kf/exec";
 
     let menuItems = [];
     let locationsList = [];
     let cart = [];
     let currentPin = "";
     let currentRole = "";
+    let selectedLoginRole = "partner";
     let currentHotelName = "HOTEL BILL";
     let adminOrdersCache = [];
-    let isQrLocked = false;
 
     function getActiveLocation() {
       return document.getElementById('lockedLocation').value || document.getElementById('locationSelect').value;
@@ -366,20 +407,12 @@
       else if (locParam) lockedValue = locParam;
 
       if (lockedValue) {
-        isQrLocked = true;
         selectEl.style.display = 'none';
         lockedEl.style.display = 'block';
         lockedEl.value = lockedValue;
         document.getElementById('qrBadge').innerText = '✓ QR Locked';
-        loadLocationOrders();
       }
     };
-
-    function handleLocationChange() {
-      if (!isQrLocked) {
-        loadLocationOrders();
-      }
-    }
 
     function populateLocationsSelect() {
       const selectEl = document.getElementById('locationSelect');
@@ -404,47 +437,6 @@
 
       selectEl.innerHTML = optionsHtml;
       if (currentVal) selectEl.value = currentVal;
-    }
-
-    async function loadLocationOrders() {
-      const loc = getActiveLocation();
-      const card = document.getElementById('myOrdersCard');
-      const list = document.getElementById('myOrdersList');
-
-      if (!loc) {
-        card.style.display = 'none';
-        return;
-      }
-
-      document.getElementById('activeLocationLabel').innerText = loc;
-      card.style.display = 'block';
-      list.innerHTML = "Checking orders...";
-
-      try {
-        const res = await fetch(`${SCRIPT_URL}?action=getLocationOrders&location=${encodeURIComponent(loc)}`);
-        const data = await res.json();
-        const myOrders = (data.orders || []).filter(
-          o => String(o.location).trim().toLowerCase() === loc.trim().toLowerCase()
-        );
-
-        if (myOrders.length === 0) {
-          list.innerHTML = "<p style='color:var(--muted);'>Abhi tak is QR/location par koi order nahi hai.</p>";
-          return;
-        }
-
-        list.innerHTML = myOrders.map(o => `
-          <div class="order-card">
-            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-              <strong>Order #${o.orderId}</strong>
-              <span class="badge ${o.status}">${o.status}</span>
-            </div>
-            <div style="font-size:11px; color:#475569; margin-bottom:4px;">🕒 ${o.time}</div>
-            <div style="font-size:12px; font-weight:600;">🍽️ ${o.items} — <strong>₹${o.total}</strong></div>
-          </div>
-        `).join('');
-      } catch (err) {
-        list.innerHTML = "<p style='color:var(--danger);'>Orders load nahi ho paye.</p>";
-      }
     }
 
     async function loadInitialData() {
@@ -534,7 +526,11 @@
 
     async function submitOrder() {
       const location = getActiveLocation();
+      const customerName = document.getElementById('customerNameInput').value.trim();
+      const customerPin = document.getElementById('customerPinInput').value.trim();
+
       if (!location) return alert("Please select Room or Table.");
+      if (!customerName || !customerPin) return alert("Please enter Registered Customer Name and PIN.");
       if (cart.length === 0) return alert("Please add at least 1 item.");
 
       const itemsText = cart.map(c => `${c.name} x${c.qty}`).join(', ');
@@ -550,6 +546,8 @@
           body: JSON.stringify({
             action: 'placeOrder',
             location,
+            customerName,
+            customerPin,
             items: itemsText,
             total
           })
@@ -558,9 +556,12 @@
         if (result.success) {
           document.getElementById('confirmedOrderId').innerText = result.orderId;
           document.getElementById('successModal').style.display = 'flex';
+          document.getElementById('customerNameInput').value = '';
+          document.getElementById('customerPinInput').value = '';
           cart = [];
           renderCart();
-          loadLocationOrders();
+        } else {
+          alert(result.message || "Order submit nahi ho paya.");
         }
       } catch (e) {
         alert("Order failed. Check internet or Script URL.");
@@ -569,23 +570,37 @@
       btn.innerText = "Place Order";
     }
 
+    function selectLoginRole(role) {
+      selectedLoginRole = role;
+      document.getElementById('rolePartnerBtn').classList.toggle('active', role === 'partner');
+      document.getElementById('roleAdminBtn').classList.toggle('active', role === 'admin');
+      document.getElementById('partnerPinBox').style.display = role === 'partner' ? 'block' : 'none';
+      document.getElementById('adminPinBox').style.display = role === 'admin' ? 'block' : 'none';
+    }
+
     function openPinModal() {
+      document.getElementById('partnerPinInput').value = '';
       document.getElementById('adminPinInput').value = '';
+      selectLoginRole('partner');
       document.getElementById('pinModal').style.display = 'flex';
     }
 
     function verifyPin() {
-      const pin = document.getElementById('adminPinInput').value.trim();
+      const pin = selectedLoginRole === 'admin'
+        ? document.getElementById('adminPinInput').value.trim()
+        : document.getElementById('partnerPinInput').value.trim();
+
       if (!pin) return alert("Enter PIN");
       currentPin = pin;
-      refreshPanelData(true);
+      refreshPanelData(true, selectedLoginRole);
     }
 
-    async function refreshPanelData(fromLogin = false) {
+    async function refreshPanelData(fromLogin = false, roleHint = "") {
+      const roleParam = roleHint || currentRole || "";
       try {
-        const res = await fetch(`${SCRIPT_URL}?action=getPanelData&pin=${encodeURIComponent(currentPin)}`);
+        const res = await fetch(`${SCRIPT_URL}?action=getPanelData&pin=${encodeURIComponent(currentPin)}&role=${encodeURIComponent(roleParam)}`);
         const data = await res.json();
-        if (!data.success) return alert("Wrong PIN!");
+        if (!data.success) return alert(data.message || "Wrong PIN!");
 
         currentRole = data.role;
 
@@ -598,16 +613,18 @@
         const isAdmin = (currentRole === 'admin');
         document.getElementById('panelHeading').innerText = isAdmin
           ? '⚙️ Main Admin Dashboard (All Orders)'
-          : `🏪 ${data.assignedLocation} Orders Only`;
+          : `🏪 ${data.assignedLocation} Partner (Only Own Orders)`;
 
         document.getElementById('tabLocationsBtn').style.display = isAdmin ? 'inline-block' : 'none';
         document.getElementById('tabMenuBtn').style.display = isAdmin ? 'inline-block' : 'none';
         document.getElementById('tabSettingsBtn').style.display = isAdmin ? 'inline-block' : 'none';
+        document.getElementById('custLocWrap').style.display = isAdmin ? 'block' : 'none';
 
         currentHotelName = (data.settings && data.settings.HotelName) || currentHotelName;
         adminOrdersCache = data.orders || [];
 
         renderAdminOrders(adminOrdersCache);
+        renderAdminCustomers(data.customers || []);
 
         if (isAdmin) {
           document.getElementById('setHotelName').value = data.settings.HotelName || '';
@@ -632,6 +649,7 @@
             <strong>${o.location} (${o.orderId})</strong>
             <span class="badge ${o.status}">${o.status}</span>
           </div>
+          <div style="font-size:12px; color:#0f172a; margin-bottom:3px;">👤 Customer: <strong>${o.customerName || 'Guest'}</strong></div>
           <div style="font-size:11px; color:#475569; margin-bottom:4px;">🕒 ${o.time}</div>
           <div style="font-size:12px; font-weight:600; margin-bottom:6px;">🍽️ ${o.items} — <strong>₹${o.total}</strong></div>
           <div class="action-btns">
@@ -642,6 +660,70 @@
           </div>
         </div>
       `).join('');
+    }
+
+    function renderAdminCustomers(customers) {
+      const container = document.getElementById('adminCustomersList');
+      if (!customers || customers.length === 0) {
+        container.innerHTML = "<p style='font-size:12px; color:var(--muted);'>No authorized customers added yet.</p>";
+        return;
+      }
+      container.innerHTML = customers.map(c => `
+        <div class="manage-item-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong>${c.name}</strong>
+              <span style="font-size:11px; color:var(--muted);">PIN: <strong>${c.pin}</strong></span>
+            </div>
+            <button class="btn-sm" style="background:#dc2626;" onclick="deleteCustomer('${c.id}')">Remove</button>
+          </div>
+          <div style="font-size:11px; color:#475569; margin-top:4px;">
+            Location: <strong>${c.location || 'Any'}</strong>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function addNewCustomer() {
+      const customerName = document.getElementById('newCustName').value.trim();
+      const customerPin = document.getElementById('newCustPin').value.trim();
+      const location = document.getElementById('newCustLoc').value.trim();
+
+      if (!customerName || !customerPin) return alert("Customer Name aur PIN dono likhein.");
+
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'addCustomer',
+          pin: currentPin,
+          customerName,
+          customerPin,
+          location
+        })
+      });
+      const data = await res.json();
+      if (!data.success) return alert(data.message || "Customer add nahi ho paya.");
+
+      document.getElementById('newCustName').value = '';
+      document.getElementById('newCustPin').value = '';
+      document.getElementById('newCustLoc').value = '';
+      alert("Customer added!");
+      await refreshPanelData();
+    }
+
+    async function deleteCustomer(customerId) {
+      if (!confirm("Is customer ko list se hatana chahte hain?")) return;
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'deleteCustomer',
+          pin: currentPin,
+          customerId
+        })
+      });
+      const data = await res.json();
+      if (!data.success) return alert(data.message || "Remove nahi ho paya.");
+      await refreshPanelData();
     }
 
     function renderAdminLocations(locs) {
@@ -660,7 +742,7 @@
             <button class="btn-sm" style="background:#dc2626;" onclick="deleteLocation('${l.name.replace(/'/g, '')}')">Delete</button>
           </div>
           <div style="font-size:11px; color:#475569; margin-top:4px;">
-            QR/Partner PIN: <strong>${l.pin ? l.pin : 'Not Set'}</strong>
+            Partner PIN: <strong>${l.pin ? l.pin : 'Not Set'}</strong>
           </div>
         </div>
       `).join('');
@@ -805,6 +887,7 @@
           <p>TAX INVOICE / BILL</p>
           <hr>
           <div class="row"><span>Order ID:</span><strong>${o.orderId}</strong></div>
+          <div class="row"><span>Customer:</span><strong>${o.customerName || 'Guest'}</strong></div>
           <div class="row"><span>Location:</span><strong>${o.location}</strong></div>
           <div class="row"><span>Date:</span><span>${o.time}</span></div>
           <hr>
@@ -826,6 +909,7 @@
       if (!o) return;
       const billText = `*${currentHotelName} - BILL*\n` +
         `Order ID: ${o.orderId}\n` +
+        `Customer: ${o.customerName || 'Guest'}\n` +
         `Location: ${o.location}\n` +
         `Date: ${o.time}\n` +
         `------------------------\n` +
@@ -849,7 +933,6 @@
       const data = await res.json();
       if (!data.success) return alert(data.message || "Status update nahi ho paya.");
       refreshPanelData();
-      loadLocationOrders();
     }
 
     async function addMenuItem() {
@@ -882,7 +965,7 @@
     }
 
     function switchTab(tabId, btn) {
-      ['ordersTab', 'locationsTab', 'menuTab', 'settingsTab'].forEach(id => document.getElementById(id).style.display = 'none');
+      ['ordersTab', 'customersTab', 'locationsTab', 'menuTab', 'settingsTab'].forEach(id => document.getElementById(id).style.display = 'none');
       document.getElementById(tabId).style.display = 'block';
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
