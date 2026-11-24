@@ -491,15 +491,15 @@
 
       document.getElementById('menuDropdown').value = "";
       document.getElementById('itemQty').value = 1;
-      Cart();
+      renderCart();
     }
 
     function removeCartItem(index) {
       cart.splice(index, 1);
-      Cart();
+      renderCart();
     }
 
-    function Cart() {
+    function renderCart() {
       const container = document.getElementById('cartContainer');
       const list = document.getElementById('cartItemsList');
       let total = 0, totalQty = 0;
@@ -566,7 +566,7 @@
           document.getElementById('customerNameInput').value = '';
           document.getElementById('customerPinInput').value = '';
           cart = [];
-          Cart();
+          renderCart();
         } else {
           alert(result.message || "Order submit nahi ho paya.");
         }
@@ -630,14 +630,14 @@
         currentHotelName = (data.settings && data.settings.HotelName) || currentHotelName;
         adminOrdersCache = data.orders || [];
 
-        AdminOrders(adminOrdersCache);
-        AdminCustomers(data.customers || []);
+        renderAdminOrders(adminOrdersCache);
+        renderAdminCustomers(data.customers || []);
 
         if (isAdmin) {
           document.getElementById('setHotelName').value = data.settings.HotelName || '';
           document.getElementById('setTagline').value = data.settings.Tagline || '';
-          AdminMenu(data.allMenu || []);
-          AdminLocations(data.locations || []);
+          renderAdminMenu(data.allMenu || []);
+          renderAdminLocations(data.locations || []);
         }
       } catch (e) {
         alert("Connection error with Google Sheet.");
@@ -680,7 +680,7 @@
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
               <strong>${c.name}</strong>
-             <span style="font-size:11px; color:var(--muted);">PIN: <strong>${c.pin}</strong></span>
+              <span style="font-size:11px; color:var(--muted);">PIN: <strong>${c.pin}</strong></span>
             </div>
             <button class="btn-sm" style="background:#dc2626;" onclick="deleteCustomer('${c.id}')">Remove</button>
           </div>
