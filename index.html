@@ -395,6 +395,13 @@
       await loadInitialData();
 
       const params = new URLSearchParams(window.location.search);
+      const partnerPin = params.get('partner');
+  if (partnerPin) {
+    currentPin = partnerPin.trim();
+    selectedLoginRole = 'partner';
+    refreshPanelData(true, 'partner');
+    return;
+  }
       const room = params.get('room');
       const table = params.get('table');
       const locParam = params.get('loc');
