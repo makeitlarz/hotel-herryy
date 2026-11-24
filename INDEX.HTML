@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Room & Table Ordering</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if (
+        e.keyCode === 123 ||
+        (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) ||
+        (e.ctrlKey && e.keyCode === 85)
+      ) {
+        e.preventDefault();
+        return false;
+      }
+    });
+  </script>
+
+  <style>
+    :root {
+      --primary: #0f172a;
+      --accent: #d97706;
+      --accent-hover: #b45309;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --success: #16a34a;
+      --danger: #dc2626;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 40px; }
+
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #fff;
+      padding: 26px 20px 32px;
+      text-align: center;
+      border-bottom: 4px solid var(--accent);
+      position: relative;
+    }
+    .admin-trigger {
+      position: absolute;
+      top: 12px; right: 14px;
+      background: rgba(255,255,255,0.12);
+      color: #e2e8f0;
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    header h1 { font-family: 'Playfair Display', serif; font-size: 25px; color: #fbbf24; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    header p { font-size: 12px; color: #cbd5e1; }
+
+    .container { max-width: 560px; margin: -16px auto 0; padding: 0 14px; }
+
+    .card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 14px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+    .card-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: var(--primary); }
+
+    label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
+    select, input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; background: #fff; }
+    input:read-only { background: #f1f5f9; font-weight: 700; color: var(--accent-hover); border-color: #cbd5e1; }
+
+    .selector-grid {
+      display: grid;
+      grid-template-columns: 1fr 85px;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .add-item-btn {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .add-item-btn:hover { background: #1e293b; }
+
+    .cart-list { margin-top: 14px; border-top: 1px dashed var(--border); padding-top: 10px; }
+    .cart-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+    .remove-btn {
+      background: #fee2e2;
+      color: var(--danger);
+      border: none;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+
+    .order-footer-box {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 2px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .total-box small { display: block; font-size: 11px; color: var(--muted); }
+    .total-box strong { font-size: 19px; color: var(--primary); }
+    .submit-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .submit-btn:hover { background: var(--accent-hover); }
+    .submit-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 100; align-items: center; justify-content: center; padding: 14px; }
+    .modal-content { background: #fff; border-radius: 14px; max-width: 540px; width: 100%; max-height: 88vh; overflow-y: auto; padding: 20px; position: relative; }
+    .close-modal { position: absolute; top: 12px; right: 14px; background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 50%; font-weight: 700; cursor: pointer; }
+
+    .admin-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .tab-btn { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); background: #f8fafc; font-size: 11px; font-weight: 600; cursor: pointer; }
+    .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .order-card, .manage-item-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      background: #f8fafc;
+    }
+    .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+    .badge.Pending { background: #fef3c7; color: #b45309; }
+    .badge.Success { background: #dcfce7; color: #15803d; }
+    .badge.Cancelled { background: #fee2e2; color: #b91c1c; }
+    .badge.Yes { background: #dcfce7; color: #15803d; }
+    .badge.No { background: #fee2e2; color: #b91c1c; }
+
+    .action-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .btn-sm { border: none; padding: 5px 9px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; color: #fff; }
+
+    .rate-edit-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .rate-edit-row input { width: 95px; padding: 6px 8px; font-size: 12px; }
+
+    .refresh-mini-btn {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      color: var(--primary);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    footer { text-align: center; font-size: 10px; color: var(--muted); margin-top: 22px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <button class="admin-trigger" onclick="openPinModal()">Admin / Partner</button>
+    <h1 id="hotelTitle">LOADING...</h1>
+    <p id="hotelTagline">Room & Table Ordering</p>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <div class="card-title">
+        <span>📍 TEA POINT</span>
+        <span id="qrBadge" style="font-size:11px; color:var(--success);"></span>
+      </div>
+      <select id="locationSelect" onchange="handleLocationChange()">
+        <option value="">-- SELECT ROOM / TABLE --</option>
+      </select>
+      <input type="text" id="lockedLocation" style="display:none;" readonly>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>🍽️ Select Food & Drinks</span>
+        <span style="font-size:11px; color:var(--muted);" id="menuCountBadge"></span>
+      </div>
+
+      <div class="selector-grid">
+        <div>
+          <label>Choose Item</label>
+          <select id="menuDropdown">
+            <option value="">Loading menu...</option>
+          </select>
+        </div>
+        <div>
+          <label>Qty</label>
+          <input type="number" id="itemQty" value="1" min="1" max="50">
+        </div>
+      </div>
+
+      <button class="add-item-btn" onclick="addSelectedItem()">+ Add Item to Order</button>
+
+      <div class="cart-list" id="cartContainer" style="display:none;">
+        <label style="margin-bottom:6px;">Your Selected Items:</label>
+        <div id="cartItemsList"></div>
+      </div>
+
+      <div class="order-footer-box">
+        <div class="total-box">
+          <small id="itemCount">0 Items Selected</small>
+          <strong>Total: ₹<span id="totalAmount">0</span></strong>
+        </div>
+        <button class="submit-btn" id="submitBtn" onclick="submitOrder()">Place Order</button>
+      </div>
+    </div>
+
+    <!-- Active QR/Selected Location Orders Only -->
+    <div class="card" id="myOrdersCard" style="display:none;">
+      <div class="card-title">
+        <span>🧾 Orders for <span id="activeLocationLabel" style="color:var(--accent-hover);"></span></span>
+        <button class="refresh-mini-btn" onclick="loadLocationOrders()">🔄 Refresh</button>
+      </div>
+      <div id="myOrdersList" style="font-size:12px; color:var(--muted);">Loading orders...</div>
+    </div>
+
+    <footer>ALL RIGHTS RESERVED TO CHACHIA GROUP @ 2026</footer>
+  </div>
+
+  <!-- Order Success Popup -->
+  <div class="modal" id="successModal">
+    <div class="modal-content" style="text-align:center;">
+      <div style="font-size:42px; margin-bottom:8px;">✅</div>
+      <h3 style="color:var(--success); margin-bottom:4px;">Order Submitted!</h3>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Aapka order bhej diya gaya hai.</p>
+      <div style="background:#f1f5f9; padding:10px; border-radius:8px; font-weight:700; margin-bottom:14px; font-size:13px;">
+        Order ID: <span id="confirmedOrderId" style="color:var(--accent-hover);"></span>
+      </div>
+      <button class="submit-btn" style="width:100%;" onclick="closeModal('successModal')">Done</button>
+    </div>
+  </div>
+
+  <!-- PIN Modal -->
+  <div class="modal" id="pinModal">
+    <div class="modal-content" style="max-width:340px; text-align:center;">
+      <button class="close-modal" onclick="closeModal('pinModal')">✕</button>
+      <h3 style="margin-bottom:10px; font-size:16px;">🔐 Login with PIN</h3>
+      <input type="password" id="adminPinInput" placeholder="Enter Admin or Partner PIN" style="margin-bottom:12px; text-align:center;">
+      <button class="submit-btn" style="width:100%;" onclick="verifyPin()">Open Panel</button>
+    </div>
+  </div>
+
+  <!-- Admin / Partner Dashboard Modal -->
+  <div class="modal" id="adminModal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal('adminModal')">✕</button>
+      <h3 id="panelHeading" style="margin-bottom:12px; font-size:16px;">⚙️ Dashboard</h3>
+
+      <div class="admin-tabs" id="panelTabs">
+        <button class="tab-btn active" id="tabOrdersBtn" onclick="switchTab('ordersTab', this)">Orders & Bills</button>
+        <button class="tab-btn" id="tabLocationsBtn" style="display:none;" onclick="switchTab('locationsTab', this)">Rooms & Tables</button>
+        <button class="tab-btn" id="tabMenuBtn" style="display:none;" onclick="switchTab('menuTab', this)">Menu</button>
+        <button class="tab-btn" id="tabSettingsBtn" style="display:none;" onclick="switchTab('settingsTab', this)">Hotel Name</button>
+      </div>
+
+      <!-- Tab 1: Orders -->
+      <div id="ordersTab">
+        <button onclick="refreshPanelData()" style="margin-bottom:10px; padding:5px 10px; font-size:11px; cursor:pointer;">🔄 Refresh Orders</button>
+        <div id="adminOrdersList">Loading orders...</div>
+      </div>
+
+      <!-- Tab 2: Add / Manage Rooms, Tables & QR/Partner PINs (Main Admin Only) -->
+      <div id="locationsTab" style="display:none;">
+        <div style="background:#f8fafc; border:1px solid var(--border); padding:12px; border-radius:8px; margin-bottom:14px;">
+          <h4 style="font-size:13px; margin-bottom:8px;">+ Add New Room or Table</h4>
+          <label>Group</label>
+          <select id="newLocGroup" style="margin-bottom:8px;">
+            <option value="Rooms (1 - 10)">Rooms</option>
+            <option value="Tables (1 - 10)">Tables</option>
+          </select>
+          <label>Room / Table / Hotel Name</label>
+          <input type="text" id="newLocName" placeholder="e.g. Room 11 or OMM JI HOTEL 2" style="margin-bottom:8px;">
+          <label>QR / Partner View PIN (Optional - sirf is location ke orders dekhne ke liye)</label>
+          <input type="text" id="newLocPin" placeholder="e.g. 5566" style="margin-bottom:10px;">
+          <button class="submit-btn" style="width:100%;" onclick="addNewLocation()">+ Add Room / Table</button>
+        </div>
+
+        <h4 style="font-size:13px; margin-bottom:8px;">Configured Rooms & Tables</h4>
+        <div id="adminLocationsList">Loading...</div>
+      </div>
+
+      <!-- Tab 3: Menu (Main Admin Only) -->
+      <div id="menuTab" style="display:none;">
+        <div style="background:#f8fafc; border:1px solid var(--border); padding:12px; border-radius:8px; margin-bottom:14px;">
+          <h4 style="font-size:13px; margin-bottom:8px;">+ Add New Menu Item</h4>
+          <label>Category</label>
+          <input type="text" id="newCat" placeholder="Snacks, Beverages, Main Course" style="margin-bottom:8px;">
+          <label>Item Name</label>
+          <input type="text" id="newItemName" placeholder="Item Name" style="margin-bottom:8px;">
+          <label>Price (₹)</label>
+          <input type="number" id="newItemPrice" placeholder="Price" style="margin-bottom:10px;">
+          <button class="submit-btn" style="width:100%;" onclick="addMenuItem()">Add to Menu</button>
+        </div>
+
+        <h4 style="font-size:13px; margin-bottom:8px;">Existing Menu Items</h4>
+        <div id="adminMenuList">Loading menu items...</div>
+      </div>
+
+      <!-- Tab 4: Hotel Settings (Main Admin Only) -->
+      <div id="settingsTab" style="display:none;">
+        <label>Hotel Name</label>
+        <input type="text" id="setHotelName" style="margin-bottom:8px;">
+        <label>Tagline</label>
+        <input type="text" id="setTagline" style="margin-bottom:12px;">
+        <button class="submit-btn" style="width:100%;" onclick="saveSettings()">Save Name</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw1znkA1jptEUvBDGeErEmtfEngRQtT6lU4EFvzTPRQ47ITTvwbO2ypOmz-oCl_OGmi/exec";
+
+    let menuItems = [];
+    let locationsList = [];
+    let cart = [];
+    let currentPin = "";
+    let currentRole = "";
+    let currentHotelName = "HOTEL BILL";
+    let adminOrdersCache = [];
+    let isQrLocked = false;
+
+    function getActiveLocation() {
+      return document.getElementById('lockedLocation').value || document.getElementById('locationSelect').value;
+    }
+
+    window.onload = async function() {
+      await loadInitialData();
+
+      const params = new URLSearchParams(window.location.search);
+      const room = params.get('room');
+      const table = params.get('table');
+      const locParam = params.get('loc');
+      const selectEl = document.getElementById('locationSelect');
+      const lockedEl = document.getElementById('lockedLocation');
+
+      let lockedValue = "";
+      if (room) lockedValue = "Room " + room;
+      else if (table) lockedValue = "Table " + table;
+      else if (locParam) lockedValue = locParam;
+
+      if (lockedValue) {
+        isQrLocked = true;
+        selectEl.style.display = 'none';
+        lockedEl.style.display = 'block';
+        lockedEl.value = lockedValue;
+        document.getElementById('qrBadge').innerText = '✓ QR Locked';
+        loadLocationOrders();
+      }
+    };
+
+    function handleLocationChange() {
+      if (!isQrLocked) {
+        loadLocationOrders();
+      }
+    }
+
+    function populateLocationsSelect() {
+      const selectEl = document.getElementById('locationSelect');
+      const currentVal = selectEl.value;
+      const groups = {};
+
+      locationsList.forEach(item => {
+        const g = item.group || 'General';
+        if (!groups[g]) groups[g] = [];
+        groups[g].push(item.name);
+      });
+
+      let optionsHtml = `<option value="">-- SELECT ROOM / TABLE --</option>`;
+      Object.keys(groups).forEach(groupName => {
+        optionsHtml += `<optgroup label="${groupName}">`;
+        groups[groupName].forEach(locName => {
+          const displayLabel = locName === 'Table 1' ? 'OMM JI HOTEL 1' : locName;
+          optionsHtml += `<option value="${locName}">${displayLabel}</option>`;
+        });
+        optionsHtml += `</optgroup>`;
+      });
+
+      selectEl.innerHTML = optionsHtml;
+      if (currentVal) selectEl.value = currentVal;
+    }
+
+    async function loadLocationOrders() {
+      const loc = getActiveLocation();
+      const card = document.getElementById('myOrdersCard');
+      const list = document.getElementById('myOrdersList');
+
+      if (!loc) {
+        card.style.display = 'none';
+        return;
+      }
+
+      document.getElementById('activeLocationLabel').innerText = loc;
+      card.style.display = 'block';
+      list.innerHTML = "Checking orders...";
+
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getLocationOrders&location=${encodeURIComponent(loc)}`);
+        const data = await res.json();
+        const myOrders = (data.orders || []).filter(
+          o => String(o.location).trim().toLowerCase() === loc.trim().toLowerCase()
+        );
+
+        if (myOrders.length === 0) {
+          list.innerHTML = "<p style='color:var(--muted);'>Abhi tak is QR/location par koi order nahi hai.</p>";
+          return;
+        }
+
+        list.innerHTML = myOrders.map(o => `
+          <div class="order-card">
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <strong>Order #${o.orderId}</strong>
+              <span class="badge ${o.status}">${o.status}</span>
+            </div>
+            <div style="font-size:11px; color:#475569; margin-bottom:4px;">🕒 ${o.time}</div>
+            <div style="font-size:12px; font-weight:600;">🍽️ ${o.items} — <strong>₹${o.total}</strong></div>
+          </div>
+        `).join('');
+      } catch (err) {
+        list.innerHTML = "<p style='color:var(--danger);'>Orders load nahi ho paye.</p>";
+      }
+    }
+
+    async function loadInitialData() {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getInitData`);
+        const data = await res.json();
+        currentHotelName = data.hotelName || 'HOTEL BILL';
+        document.getElementById('hotelTitle').innerText = currentHotelName;
+        document.getElementById('hotelTagline').innerText = data.tagline || 'Room & Table Ordering';
+        menuItems = data.menu || [];
+        locationsList = data.locations || [];
+        populateDropdown();
+        populateLocationsSelect();
+      } catch (err) {
+        document.getElementById('menuDropdown').innerHTML = "<option>Error loading menu</option>";
+      }
+    }
+
+    function populateDropdown() {
+      const dropdown = document.getElementById('menuDropdown');
+      document.getElementById('menuCountBadge').innerText = `${menuItems.length} Items`;
+      if (menuItems.length === 0) {
+        dropdown.innerHTML = "<option value=''>No items available</option>";
+        return;
+      }
+      dropdown.innerHTML = `<option value="">-- Select an item --</option>` +
+        menuItems.map(item => `<option value="${item.id}">[${item.category}] ${item.name} — ₹${item.price}</option>`).join('');
+    }
+
+    function addSelectedItem() {
+      const selectedId = document.getElementById('menuDropdown').value;
+      const qty = parseInt(document.getElementById('itemQty').value) || 1;
+      if (!selectedId) return alert("Pehle menu dropdown se koi item chunein.");
+      if (qty < 1) return alert("Quantity kam se kam 1 honi chahiye.");
+
+      const itemObj = menuItems.find(m => String(m.id) === String(selectedId));
+      if (!itemObj) return;
+
+      const existing = cart.find(c => String(c.id) === String(selectedId));
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        cart.push({ id: itemObj.id, name: itemObj.name, price: itemObj.price, qty: qty });
+      }
+
+      document.getElementById('menuDropdown').value = "";
+      document.getElementById('itemQty').value = 1;
+      renderCart();
+    }
+
+    function removeCartItem(index) {
+      cart.splice(index, 1);
+      renderCart();
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cartContainer');
+      const list = document.getElementById('cartItemsList');
+      let total = 0, totalQty = 0;
+
+      if (cart.length === 0) {
+        container.style.display = 'none';
+        document.getElementById('totalAmount').innerText = 0;
+        document.getElementById('itemCount').innerText = "0 Items Selected";
+        return;
+      }
+
+      container.style.display = 'block';
+      list.innerHTML = cart.map((c, idx) => {
+        const sub = c.price * c.qty;
+        total += sub;
+        totalQty += c.qty;
+        return `
+          <div class="cart-row">
+            <div><strong>${c.name}</strong> × ${c.qty}</div>
+            <div>
+              <strong>₹${sub}</strong>
+              <button class="remove-btn" onclick="removeCartItem(${idx})">✕</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('totalAmount').innerText = total;
+      document.getElementById('itemCount').innerText = `${totalQty} Items Selected`;
+    }
+
+    async function submitOrder() {
+      const location = getActiveLocation();
+      if (!location) return alert("Please select Room or Table.");
+      if (cart.length === 0) return alert("Please add at least 1 item.");
+
+      const itemsText = cart.map(c => `${c.name} x${c.qty}`).join(', ');
+      const total = cart.reduce((sum, c) => sum + (c.price * c.qty), 0);
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerText = "Placing...";
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'placeOrder',
+            location,
+            items: itemsText,
+            total
+          })
+        });
+        const result = await res.json();
+        if (result.success) {
+          document.getElementById('confirmedOrderId').innerText = result.orderId;
+          document.getElementById('successModal').style.display = 'flex';
+          cart = [];
+          renderCart();
+          loadLocationOrders();
+        }
+      } catch (e) {
+        alert("Order failed. Check internet or Script URL.");
+      }
+      btn.disabled = false;
+      btn.innerText = "Place Order";
+    }
+
+    function openPinModal() {
+      document.getElementById('adminPinInput').value = '';
+      document.getElementById('pinModal').style.display = 'flex';
+    }
+
+    function verifyPin() {
+      const pin = document.getElementById('adminPinInput').value.trim();
+      if (!pin) return alert("Enter PIN");
+      currentPin = pin;
+      refreshPanelData(true);
+    }
+
+    async function refreshPanelData(fromLogin = false) {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getPanelData&pin=${encodeURIComponent(currentPin)}`);
+        const data = await res.json();
+        if (!data.success) return alert("Wrong PIN!");
+
+        currentRole = data.role;
+
+        if (fromLogin) {
+          closeModal('pinModal');
+          document.getElementById('adminModal').style.display = 'flex';
+          switchTab('ordersTab', document.getElementById('tabOrdersBtn'));
+        }
+
+        const isAdmin = (currentRole === 'admin');
+        document.getElementById('panelHeading').innerText = isAdmin
+          ? '⚙️ Main Admin Dashboard (All Orders)'
+          : `🏪 ${data.assignedLocation} Orders Only`;
+
+        document.getElementById('tabLocationsBtn').style.display = isAdmin ? 'inline-block' : 'none';
+        document.getElementById('tabMenuBtn').style.display = isAdmin ? 'inline-block' : 'none';
+        document.getElementById('tabSettingsBtn').style.display = isAdmin ? 'inline-block' : 'none';
+
+        currentHotelName = (data.settings && data.settings.HotelName) || currentHotelName;
+        adminOrdersCache = data.orders || [];
+
+        renderAdminOrders(adminOrdersCache);
+
+        if (isAdmin) {
+          document.getElementById('setHotelName').value = data.settings.HotelName || '';
+          document.getElementById('setTagline').value = data.settings.Tagline || '';
+          renderAdminMenu(data.allMenu || []);
+          renderAdminLocations(data.locations || []);
+        }
+      } catch (e) {
+        alert("Connection error with Google Sheet.");
+      }
+    }
+
+    function renderAdminOrders(orders) {
+      const list = document.getElementById('adminOrdersList');
+      if (!orders || orders.length === 0) {
+        list.innerHTML = "<p style='font-size:12px; color:var(--muted);'>No orders found.</p>";
+        return;
+      }
+      list.innerHTML = orders.map((o, idx) => `
+        <div class="order-card">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <strong>${o.location} (${o.orderId})</strong>
+            <span class="badge ${o.status}">${o.status}</span>
+          </div>
+          <div style="font-size:11px; color:#475569; margin-bottom:4px;">🕒 ${o.time}</div>
+          <div style="font-size:12px; font-weight:600; margin-bottom:6px;">🍽️ ${o.items} — <strong>₹${o.total}</strong></div>
+          <div class="action-btns">
+            <button class="btn-sm" style="background:#16a34a;" onclick="changeStatus('${o.orderId}', 'Success')">✓ Success</button>
+            <button class="btn-sm" style="background:#dc2626;" onclick="changeStatus('${o.orderId}', 'Cancelled')">✕ Cancel</button>
+            <button class="btn-sm" style="background:#0f172a;" onclick="printBill(${idx})">🖨️ Print Bill</button>
+            <button class="btn-sm" style="background:#25d366;" onclick="shareBill(${idx})">📲 Share</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderAdminLocations(locs) {
+      const container = document.getElementById('adminLocationsList');
+      if (!locs || locs.length === 0) {
+        container.innerHTML = "<p style='font-size:12px; color:var(--muted);'>No rooms/tables configured.</p>";
+        return;
+      }
+      container.innerHTML = locs.map(l => `
+        <div class="manage-item-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong>${l.name}</strong>
+              <span style="font-size:11px; color:var(--muted);">(${l.group || 'General'})</span>
+            </div>
+            <button class="btn-sm" style="background:#dc2626;" onclick="deleteLocation('${l.name.replace(/'/g, '')}')">Delete</button>
+          </div>
+          <div style="font-size:11px; color:#475569; margin-top:4px;">
+            QR/Partner PIN: <strong>${l.pin ? l.pin : 'Not Set'}</strong>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function addNewLocation() {
+      const group = document.getElementById('newLocGroup').value;
+      const name = document.getElementById('newLocName').value.trim();
+      const accessPin = document.getElementById('newLocPin').value.trim();
+      if (!name) return alert("Room ya Table ka naam likhein.");
+
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'addLocation',
+          pin: currentPin,
+          group,
+          name,
+          accessPin
+        })
+      });
+      const data = await res.json();
+      if (!data.success) return alert(data.message || "Add nahi ho paya.");
+
+      document.getElementById('newLocName').value = '';
+      document.getElementById('newLocPin').value = '';
+      alert("Room/Table added!");
+      await loadInitialData();
+      await refreshPanelData();
+    }
+
+    async function deleteLocation(name) {
+      if (!confirm(`"${name}" ko list se hatana chahte hain?`)) return;
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'deleteLocation',
+          pin: currentPin,
+          name
+        })
+      });
+      const data = await res.json();
+      if (!data.success) return alert(data.message || "Delete nahi ho paya.");
+      await loadInitialData();
+      await refreshPanelData();
+    }
+
+    function renderAdminMenu(allMenu) {
+      const container = document.getElementById('adminMenuList');
+      if (!allMenu || allMenu.length === 0) {
+        container.innerHTML = "<p style='font-size:12px; color:var(--muted);'>No menu items in sheet.</p>";
+        return;
+      }
+      container.innerHTML = allMenu.map(item => {
+        const isAvail = String(item.available).toLowerCase() === 'yes';
+        const nextAvail = isAvail ? 'No' : 'Yes';
+        const toggleLabel = isAvail ? 'Hide Item' : 'Show Item';
+        return `
+          <div class="manage-item-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong>${item.name}</strong>
+                <span style="font-size:11px; color:var(--muted);">(${item.category})</span>
+              </div>
+              <span class="badge ${isAvail ? 'Yes' : 'No'}">${isAvail ? 'Active' : 'Hidden'}</span>
+            </div>
+            <div class="rate-edit-row">
+              <span style="font-size:12px; font-weight:600;">Rate ₹:</span>
+              <input type="number" id="rate-${item.id}" value="${item.price}">
+              <button class="btn-sm" style="background:#d97706;" onclick="saveItemRate('${item.id}')">Save Rate</button>
+              <button class="btn-sm" style="background:#475569;" onclick="toggleItemAvail('${item.id}', '${nextAvail}')">${toggleLabel}</button>
+              <button class="btn-sm" style="background:#dc2626;" onclick="deleteMenuItem('${item.id}', '${item.name.replace(/'/g, '')}')">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function saveItemRate(id) {
+      const newPrice = document.getElementById(`rate-${id}`).value;
+      if (!newPrice || Number(newPrice) <= 0) return alert("Valid rate daalein.");
+
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'updateMenuItem',
+          pin: currentPin,
+          id: id,
+          price: Number(newPrice)
+        })
+      });
+      alert("Rate Updated!");
+      refreshPanelData();
+      loadInitialData();
+    }
+
+    async function toggleItemAvail(id, nextAvail) {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'updateMenuItem',
+          pin: currentPin,
+          id: id,
+          available: nextAvail
+        })
+      });
+      refreshPanelData();
+      loadInitialData();
+    }
+
+    async function deleteMenuItem(id, name) {
+      if (!confirm(`Kya aap "${name}" ko menu se permanently delete karna chahte hain?`)) return;
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'deleteMenuItem',
+          pin: currentPin,
+          id: id
+        })
+      });
+      alert("Item Deleted!");
+      refreshPanelData();
+      loadInitialData();
+    }
+
+    function printBill(index) {
+      const o = adminOrdersCache[index];
+      if (!o) return;
+      const win = window.open('', '_blank', 'width=350,height=550');
+      win.document.write(`
+        <html>
+        <head><title>Bill - ${o.orderId}</title>
+        <style>
+          body { font-family: monospace; padding: 16px; width: 280px; margin: auto; }
+          h2, p { text-align: center; margin: 4px 0; }
+          hr { border-top: 1px dashed #000; margin: 10px 0; }
+          .row { display: flex; justify-content: space-between; font-size: 13px; margin: 4px 0; }
+        </style>
+        </head>
+        <body>
+          <h2>${currentHotelName}</h2>
+          <p>TAX INVOICE / BILL</p>
+          <hr>
+          <div class="row"><span>Order ID:</span><strong>${o.orderId}</strong></div>
+          <div class="row"><span>Location:</span><strong>${o.location}</strong></div>
+          <div class="row"><span>Date:</span><span>${o.time}</span></div>
+          <hr>
+          <p style="text-align:left; font-weight:bold;">Items:</p>
+          <p style="text-align:left; font-size:13px;">${o.items}</p>
+          <hr>
+          <div class="row" style="font-size:16px;"><strong>GRAND TOTAL:</strong><strong>₹${o.total}</strong></div>
+          <hr>
+          <p>Thank you for visiting!</p>
+          <script>window.print();<\/script>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+
+    function shareBill(index) {
+      const o = adminOrdersCache[index];
+      if (!o) return;
+      const billText = `*${currentHotelName} - BILL*\n` +
+        `Order ID: ${o.orderId}\n` +
+        `Location: ${o.location}\n` +
+        `Date: ${o.time}\n` +
+        `------------------------\n` +
+        `Items: ${o.items}\n` +
+        `------------------------\n` +
+        `*Total Amount: ₹${o.total}*\n` +
+        `Thank you!`;
+
+      if (navigator.share) {
+        navigator.share({ title: `Bill ${o.orderId}`, text: billText });
+      } else {
+        window.open(`https://wa.me/?text=${encodeURIComponent(billText)}`, '_blank');
+      }
+    }
+
+    async function changeStatus(orderId, status) {
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'updateStatus', pin: currentPin, orderId, status })
+      });
+      const data = await res.json();
+      if (!data.success) return alert(data.message || "Status update nahi ho paya.");
+      refreshPanelData();
+      loadLocationOrders();
+    }
+
+    async function addMenuItem() {
+      const category = document.getElementById('newCat').value.trim();
+      const name = document.getElementById('newItemName').value.trim();
+      const price = document.getElementById('newItemPrice').value;
+      if (!category || !name || !price) return alert("Fill all fields");
+
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'addMenuItem', pin: currentPin, category, name, price })
+      });
+      alert("Item Added!");
+      document.getElementById('newItemName').value = '';
+      document.getElementById('newItemPrice').value = '';
+      refreshPanelData();
+      loadInitialData();
+    }
+
+    async function saveSettings() {
+      const hotelName = document.getElementById('setHotelName').value;
+      const tagline = document.getElementById('setTagline').value;
+
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'updateSettings', pin: currentPin, hotelName, tagline })
+      });
+      alert("Updated!");
+      loadInitialData();
+    }
+
+    function switchTab(tabId, btn) {
+      ['ordersTab', 'locationsTab', 'menuTab', 'settingsTab'].forEach(id => document.getElementById(id).style.display = 'none');
+      document.getElementById(tabId).style.display = 'block';
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+  </script>
+</body>
+</html>
