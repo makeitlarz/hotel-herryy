@@ -491,15 +491,15 @@
 
       document.getElementById('menuDropdown').value = "";
       document.getElementById('itemQty').value = 1;
-      renderCart();
+      Cart();
     }
 
     function removeCartItem(index) {
       cart.splice(index, 1);
-      renderCart();
+      Cart();
     }
 
-    function renderCart() {
+    function Cart() {
       const container = document.getElementById('cartContainer');
       const list = document.getElementById('cartItemsList');
       let total = 0, totalQty = 0;
@@ -566,7 +566,7 @@
           document.getElementById('customerNameInput').value = '';
           document.getElementById('customerPinInput').value = '';
           cart = [];
-          renderCart();
+          Cart();
         } else {
           alert(result.message || "Order submit nahi ho paya.");
         }
@@ -630,7 +630,7 @@
         currentHotelName = (data.settings && data.settings.HotelName) || currentHotelName;
         adminOrdersCache = data.orders || [];
 
-        renderAdminOrders(adminOrdersCache);
+        AdminOrders(adminOrdersCache);
         renderAdminCustomers(data.customers || []);
 
         if (isAdmin) {
@@ -680,7 +680,7 @@
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
               <strong>${c.name}</strong>
-              <span style="font-size:11px; color:var(--muted);"> a : <strong>${Authorized}</strong></span>
+              <span style="font-size:11px; color:var(--muted);">: <strong>Authorized</strong></span>
             </div>
             <button class="btn-sm" style="background:#dc2626;" onclick="deleteCustomer('${c.id}')">Remove</button>
           </div>
