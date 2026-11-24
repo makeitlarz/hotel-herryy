@@ -631,13 +631,13 @@
         adminOrdersCache = data.orders || [];
 
         AdminOrders(adminOrdersCache);
-        renderAdminCustomers(data.customers || []);
+        AdminCustomers(data.customers || []);
 
         if (isAdmin) {
           document.getElementById('setHotelName').value = data.settings.HotelName || '';
           document.getElementById('setTagline').value = data.settings.Tagline || '';
-          renderAdminMenu(data.allMenu || []);
-          renderAdminLocations(data.locations || []);
+          AdminMenu(data.allMenu || []);
+          AdminLocations(data.locations || []);
         }
       } catch (e) {
         alert("Connection error with Google Sheet.");
@@ -680,7 +680,7 @@
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
               <strong>${c.name}</strong>
-              <span style="font-size:11px; color:var(--muted);">: <strong>Authorized</strong></span>
+              <span style="font-size:11px; color:var(--muted);">PIN: <strong>confirm</strong></span>
             </div>
             <button class="btn-sm" style="background:#dc2626;" onclick="deleteCustomer('${c.id}')">Remove</button>
           </div>
